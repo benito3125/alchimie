@@ -1,0 +1,17 @@
+INSERT INTO benevoles (ID, first_name, family_name, vege, RJM, RVM, RVS, RSM, RDM) VALUES ('1681169816400x948227997024593900','Antoine','Bauza','0','0','0','0','1','1');
+INSERT INTO benevoles (ID, first_name, family_name, vege, RJM, RVM, RVS, RSM, RDM) VALUES ('1681169846682x991130880820100700','Thomas','Provoost','0','0','0','0','1','1');
+INSERT INTO benevoles (ID, first_name, family_name, vege, RJM, RVM, RVS, RSM, RDM) VALUES ('1681169898708x845639374283966100','Piéro','Lechevalier','0','0','1','1','1','1');
+INSERT INTO benevoles (ID, first_name, family_name, vege, RJM, RVM, RVS, RSM, RDM) VALUES ('1681169902793x691160005161275440','Ericka','Lechevalier','0','0','1','1','1','1');
+INSERT INTO benevoles (ID, first_name, family_name, vege, RJM, RVM, RVS, RSM, RDM) VALUES ('1681170009096x513146792843530940','Laetitia','Grailhes Meunier','0','0','0','1','1','1');
+INSERT INTO benevoles (ID, first_name, family_name, vege, RJM, RVM, RVS, RSM, RDM) VALUES ('1681170010728x671788682106818700','Lia-Sabine','????','0','0','0','1','1','1');
+INSERT INTO benevoles (ID, first_name, family_name, vege, RJM, RVM, RVS, RSM, RDM) VALUES ('1681170012372x236139372488926240','????','????','0','0','0','1','1','1');
+INSERT INTO benevoles (ID, first_name, family_name, vege, RJM, RVM, RVS, RSM, RDM) VALUES ('1681170014440x772175311431573300','????','????','0','0','0','1','1','1');
+INSERT INTO benevoles (ID, first_name, family_name, vege, RJM, RVM, RVS, RSM, RDM) VALUES ('1681170302619x310657869223452500','Clemence','Delemasure','1','0','0','1','1','1');
+INSERT INTO benevoles (ID, first_name, family_name, vege, RJM, RVM, RVS, RSM, RDM) VALUES ('1681170304630x196007955541307230','????','????','0','0','0','1','1','1');
+INSERT INTO benevoles (ID, first_name, family_name, vege, RJM, RVM, RVS, RSM, RDM) VALUES ('1681170374548x546898922065225860','Simon','Boyé','0','0','1','1','1','1');
+INSERT INTO benevoles (ID, first_name, family_name, vege, RJM, RVM, RVS, RSM, RDM) VALUES ('1681170407638x250725280231958400','Benjamin','Planas','0','1','1','1','1','1');
+INSERT INTO benevoles (ID, first_name, family_name, vege, RJM, RVM, RVS, RSM, RDM) VALUES ('1681170459777x136674122575714660','François','Bachelart','0','0','1','1','1','1');
+INSERT INTO benevoles (ID, first_name, family_name, vege, RJM, RVM, RVS, RSM, RDM) VALUES ('1681170462560x461490809182362430','????','????','0','0','0','0','1','1');
+INSERT INTO benevoles (ID, first_name, family_name, vege, RJM, RVM, RVS, RSM, RDM) VALUES ('1681170464262x846929827049805000','????','????','0','0','1','1','1','1');
+INSERT INTO benevoles (ID, first_name, family_name, vege, RJM, RVM, RVS, RSM, RDM) VALUES ('1681170514642x540891585477632400','Frédéric','Colombier','0','0','0','0','0','0');
+INSERT INTO benevoles (ID, first_name, family_name, vege, RJM, RVM, RVS, RSM, RDM) VALUES ('1681170983239x221100357848489360','David','Bertolo','0','0','0','1','1','1');
