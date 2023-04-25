@@ -5,7 +5,7 @@
 	if(!isset($_SESSION["username"])){
 		header("Location: index.php");
 		exit(); 
-	}
+	}else{
 ?>
 <!DOCTYPE html>
 <html>
@@ -20,3 +20,5 @@
 		</div>
 	</body>
 </html>
+
+<?php } ?>
