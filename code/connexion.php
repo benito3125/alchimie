@@ -48,20 +48,7 @@
 </header>
 
 <body>
-    <div position="relative">
-        <form class="box" action="connexion.php" method="post" name="login" position="relative">
-            <h1 class="box-title">Connexion</h1>
-            <?php if (isset($_GET['error'])) { ?>
-
-                <p class="error"><?php echo $_GET['error']; ?></p>
-
-            <?php } ?>
-            <input type="text" class="box-input" name="username" placeholder="Nom d'utilisateur">
-            <input type="password" class="box-input" name="password" placeholder="Mot de passe">
-            <button type="submit" value="Connexion " name="submit" class="box-button">Connexion</button>
-        </form>
-    </div>
-      <?php 
+    <?php 
 
         session_start(); 
 
@@ -87,15 +74,11 @@
 
             if (empty($username)) {
 
-                header("Location: connexion.php?error=User Name is required");
-
-                exit();
+                 $message = "Le nom d'utilisateur est incorrect.";
 
             }else if(empty($password)){
 
-                header("Location: connexion.php?error=Password is required");
-
-                exit();
+                 $message = "Le mot de passe est incorrect.";
 
             }else{
 
@@ -123,18 +106,13 @@
 
                     }else{
 
-                        header("Location: connexion.php?error=Incorect User name or password");
-
-                        exit();
+                         $message = "Le nom d'utilisateur ou le mot de passe est incorrect.";
 
                     }
 
                 }else{
 
-                    header("Location: connexion.php?error=Incorect User name or password");
-
-                    exit();
-
+                    $message = "Le nom d'utilisateur ou le mot de passe est incorrect.";
                 }
 
             }
@@ -147,7 +125,24 @@
 
         }
     ?>
+    <div position="relative">
+        <form class="box" action="connexion.php" method="post" name="login" position="relative">
+            <h1 class="box-title">Connexion</h1>
+            <?php if (isset($_GET['error'])) { ?>
 
+                <p class="error"><?php echo $_GET['error']; ?></p>
+
+            <?php } ?>
+            <input type="text" class="box-input" name="username" placeholder="Nom d'utilisateur">
+            <input type="password" class="box-input" name="password" placeholder="Mot de passe">
+            <button type="submit" value="Connexion " name="submit" class="box-button">Connexion</button>
+            <?php if (! empty($message)) { ?>
+                <p class="errorMessage">
+                <?php echo $message; ?>
+                </p>
+            <?php } ?>
+        </form>
+    </div>
 </body>
 
 
