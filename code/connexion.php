@@ -68,10 +68,9 @@
 
             }
 
-            $username = validate($_POST['uname']);
+            $username = validate($_POST['username']);
 
             $password = validate($_POST['password']);
-
             if (empty($username)) {
 
                  $message = "Le nom d'utilisateur est incorrect.";
@@ -82,7 +81,7 @@
 
             }else{
 
-                $sql = "SELECT * FROM users WHERE username='$username' AND password='".hash('sha256', $password)."'";
+                $sql = "SELECT * FROM 'users' WHERE 'username=$username' AND 'password=$password'";
 
                 $result = mysqli_query($conn, $sql);
 
@@ -93,10 +92,9 @@
                     if ($row['username'] === $username && $row['password'] === $password) {
 
                         echo "Logged in!";
-
+                    
                         $_SESSION['username'] = $row['username'];
 
-                        $_SESSION['name'] = $row['name'];
 
                         header("Location: connect.php");
 
@@ -117,12 +115,13 @@
 
         }else{
 
-            header("Location: connexion.php");
+            //header("Location: connexion.php");
 
-            exit();
+            //exit();
 
         }
     ?>
+    
     <div position="relative">
         <form class="box" action="connexion.php" method="post" name="login" position="relative">
             <h1 class="box-title">Connexion</h1>
