@@ -48,7 +48,20 @@
 </header>
 
 <body>
-    <?php 
+    <div position="relative">
+        <form class="box" action="connexion.php" method="post" name="login" position="relative">
+            <h1 class="box-title">Connexion</h1>
+            <?php if (isset($_GET['error'])) { ?>
+
+                <p class="error"><?php echo $_GET['error']; ?></p>
+
+            <?php } ?>
+            <input type="text" class="box-input" name="username" placeholder="Nom d'utilisateur">
+            <input type="password" class="box-input" name="password" placeholder="Mot de passe">
+            <button type="submit" value="Connexion " name="submit" class="box-button">Connexion</button>
+        </form>
+    </div>
+      <?php 
 
         session_start(); 
 
@@ -134,20 +147,6 @@
 
         }
     ?>
-    <div position="relative">
-        <form class="box" action="connexion.php" method="post" name="login" position="relative">
-            <h1 class="box-title">Connexion</h1>
-            <?php if (isset($_GET['error'])) { ?>
-
-                <p class="error"><?php echo $_GET['error']; ?></p>
-
-            <?php } ?>
-            <input type="text" class="box-input" name="username" placeholder="Nom d'utilisateur">
-            <input type="password" class="box-input" name="password" placeholder="Mot de passe">
-            <button type="submit" value="Connexion " name="submit" class="box-button">Connexion</button>
-        </form>
-    </div>
-        
 
 </body>
 
