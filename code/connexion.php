@@ -2,6 +2,7 @@
 <html>
 
 <head>
+    <link rel="stylesheet" href="style.css" />
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -47,60 +48,40 @@
 </header>
 
 <body>
-
-    <div class="container">
-        <div class="row" style="position: right">
-            <div class="bubble-element Group" style="position: center"
-                style="box-sizing: border-box; position:inherit; z-index: 3; top: 25px; width: 283px; left: 0px; border-style: solid; border-width: 2px; border-color: rgb(107, 107, 107); border-radius: 0px; opacity: 1; height: 221px;">
-                <div class="bubble-r-line" style="margin-top: 16px; height: 30px;">
-                    <div class="bubble-r-box" style="height: 30px; left: 52px; width: 179px;">
-                        <h3 class="bubble-element Text"
-                            style="white-space: pre-wrap; position: relative; box-sizing: border-box; z-index: 2; top: 0px; width: 179px; left: 0px; height: 30px; overflow: visible; font-family: Barlow; font-size: 16px; font-weight: 400; color: rgb(9, 23, 71); text-align: center; line-height: 1.5; border-radius: 0px; opacity: 1;">
-                            <div class="content">Log in</div>
-                        </h3>
-                    </div>
-                </div>
-                <div class="bubble-r-line" style="margin-top: 2px; height: 40px;">
-                    <div class="bubble-r-box" style="height: 40px; left: 16px; width: 251px;"><input type="login" name="login" class="" tabindex="5" placeholder="login" maxlength="" style="position: relative; box-sizing: border-box; z-index: 3; height: 40px; top: 0px; width: 251px; left: 0px; border: 1px solid rgb(189, 189, 189); background-color: rgb(252, 252, 252); border-radius: 5px; font-family: Barlow; font-size: 16px; font-weight: 500; color: rgb(107, 107, 107); padding: 0px 10px; opacity: 1;">
-                    </div>
-                </div>
-                <div class="bubble-r-line" style="margin-top: 15px; height: 40px;">
-                    <div class="bubble-r-box" style="height: 40px; left: 16px; width: 251px;"><input type="password" name="password"
-                            autocomplete="new-password" class="" tabindex="6"
-                            placeholder="Password" maxlength=""
-                            style="position: relative; box-sizing: border-box; z-index: 4; height: 40px; top: 0px; width: 251px; left: 0px; border: 1px solid rgb(189, 189, 189); background-color: rgb(252, 252, 252); border-radius: 5px; font-family: Barlow; font-size: 16px; font-weight: 500; color: rgb(107, 107, 107); padding: 0px 10px; opacity: 1;">
-                    </div>
-                </div>
-                <div class="bubble-r-line" style="margin-top: 18px; height: 40px;">
-                    <div class="bubble-r-box" style="height: 40px; left: 14px; width: 251px;"><button
-                            class="bubble-element Button clickable-element" tabindex="7"
-                            style="padding: 0px; cursor: pointer; background: none rgb(134, 23, 115); border: none; text-align: center; position: center; box-sizing: border-box; z-index: 6; height: 40px; top: 0px; width: 251px; left: 0px; font-family: Barlow; font-size: 16px; font-weight: 600; color: rgb(255, 255, 255); letter-spacing: 2px; line-height: 1; border-radius: 5px; opacity: 1; transition: background 200ms ease 0s; box-shadow: none;">Log In</button></div>
-                </div>
-            </div>
-
-
+    <?php
+        require('config.php');
+        session_start();
+        if (isset($_POST['username'])){
+        $username = stripslashes($_REQUEST['username']);
+        $username = mysqli_real_escape_string($conn, $username);
+        $password = stripslashes($_REQUEST['password']);
+        $password = mysqli_real_escape_string($conn, $password);
+            $query = "SELECT * FROM `users` WHERE username='$username' and password='".hash('sha256', $password)."'";
+        $result = mysqli_query($conn,$query) or die(mysql_error());
+        $rows = mysqli_num_rows($result);
+        if($rows==1){
+            $_SESSION['username'] = $username;
+            header("Location: logue.php");
+        }else{
+            $message = "Le nom d'utilisateur ou le mot de passe est incorrect.";
+        }
+        }
+    ?>
+    <div position="relative">
+    <form class="box" action="" method="post" name="login" position="relative">
+        <h1 class="box-title">Connexion</h1>
+        <input type="text" class="box-input" name="username" placeholder="Nom d'utilisateur">
+        <input type="password" class="box-input" name="password" placeholder="Mot de passe">
+        <input type="submit" value="Connexion " name="submit" class="box-button">
+        <?php if (! empty($message)) { ?>
+            <p class="errorMessage">
+                <?php echo $message; ?>
+            </p>
+            <?php } ?>
         </div>
-    </div>
-    <hr>
+</form>
 </body>
 
-<?php
-session_start()
-if(isset($_POST['login']) && isset($post['password']))
-{
-    //connexion à la base de données 
-    $db_username = 'admin';
-    $db_password = 'Benjamin31';
-    $db_name = 'repas';
-    $db_host = 'bb621576-001.eu.clouddb.ovh.net:35466';
-    $db = mysqli_connect( $db_host,$db_name, $db_username, $db_password)
-    or die('could not connect to database');
-}
-$db = new PDO
-$username = mysqli_real_escape_string($db,htmlspecialchars($_POST['login'])); 
-$password = mysqli_real_escape_string($db,htmlspecialchars($_POST['password']));
-mysqli_close($db); // fermer la connexion
-?>
 
 <!-- Footer -->
 <footer>
