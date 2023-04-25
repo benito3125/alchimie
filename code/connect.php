@@ -26,9 +26,8 @@
 	if(isset($_SESSION["username"])){
 ?>
 
-<body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-default navbar-custom">
+<!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom">
         <div class="container">
             <div class="navbar-header page-scroll">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse">
@@ -37,7 +36,6 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <h1>Bienvenue <?php echo $_SESSION['username']; ?>!</h1>
             </div>
             <div class="collapse navbar-collapse" id="navbar-collapse">
                 <ul class="nav navbar-nav navbar-right">
@@ -50,11 +48,27 @@
         </div>
         <!-- /.container -->
     </nav>
+<!-- Page Header -->
+<header class="intro-header"
+    style="background-image: url('https://benevoles.alchimiedujeu.fr/themes/batblog/img/default-bg.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="site-heading">
+				<h1>Bienvenue <?php echo $_SESSION['username']; ?>!</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+    <!-- Navigation -->
+    
 	<body>
 		<div class="sucess">
 		
 		<p>C'est votre tableau de bord.</p>
-		<a href="logout.php">Déconnexion</a>
 		</div>
 	</body>
 </html>
