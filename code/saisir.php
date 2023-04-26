@@ -1,50 +1,25 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<title>Scanner de QR code</title>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<style>
-		body {
-			font-family: Arial, sans-serif;
-			background-color: #f2f2f2;
-			text-align: center;
-			padding-top: 50px;
-		}
-		h1 {
-			color: #333;
-			margin-bottom: 30px;
-		}
-		#scanner {
-			margin: auto;
-			width: 200px;
-			height: 200px;
-			background-color: #fff;
-			position: relative;
-			overflow: hidden;
-			border: 3px solid #333;
-			border-radius: 10px;
-			margin-bottom: 30px;
-		}
-		#scanner video {
-			position: absolute;
-			top: 0;
-			left: 0;
-			width: 100%;
-			height: 100%;
-		}
-		#scanner canvas {
-			display: none;
-		}
-		#result {
-			font-size: 24px;
-			color: #333;
-			margin-bottom: 50px;
-		}
-	</style>
-</head>
+
+	<!-- Inclusion des scripts et liens -->
+	<?php include"link.php"?>
+	<head>
+		<link rel="stylesheet" href="../css/style-qrcode.css" />
+	</head>
+    <!-- Navigation -->
+    <?php include"nav.php"?>
+    <!-- Header -->
+    <?php include"header.php"?>
+
 <body>
-	<?php include "config.php";?>
+<?php
+	// Initialiser la session
+	session_start();
+	// Vérifiez si l'utilisateur est connecté, sinon redirigez-le vers la page de connexion
+	include "config.php";
+	if(isset($_SESSION["username"])){
+?>
+
 		<h1>Scanner de QR code</h1>
 		<div id="scanner">
 			<video id="preview"></video>
@@ -103,5 +78,14 @@
         $id = $_POST['id'];
         $jour = $_POST['jour'];
         ?>
+	<?php 
+}else{
+
+     header("Location: index.php");
+
+     exit();
+}
+
+?>
 </body>
 </html>
