@@ -1,13 +1,5 @@
-<header class="intro-header" style="background-image: url('https://benevoles.alchimiedujeu.fr/themes/batblog/img/default-bg.jpg')">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
-                <div class="site-heading">
-                    <h1>Les Bénévoles de l'Alchimie du Jeu de Toulouse</h1>
-                    <hr class="small">
-                    <span class="subheading">sont ensemble pour organiser un chouette festival</span>
-                </div>
-            </div>
-        </div>
-    </div>
-</header>
+footer {
+    position: relative;
+    bottom: 0;
+    background-color: rgba(254, 174, 128, 0.5);
+  }

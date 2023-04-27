@@ -1,97 +1,76 @@
 <!DOCTYPE html>
 <html>
     <!-- Inclusion des scripts et liens -->
-    <?php include"link.php"?>
+    <?php include "link.php"?>
     <head>
-        <link rel="stylesheet" href="style_table.css" />
+        <link rel="stylesheet" href="../css/style_table.css" />
+        <link rel="stylesheet" href="../css/style.css" />
     </head>
-    
+
     <!-- Navigation -->
-    <?php include"nav.php"?>
+    <?php include "nav.php"?>
+
     <!-- Header -->
-    <?php include"header.php"?>
-
-
-<body>
-<table class="my-table">
-  <tr>
-    <th class="centered">ID</th>
-    <th class="centered">Prénon</th>
-    <th class="centered">Nom</th>
-    <th class="centered">Végé</th>
-    <th class="centered">Jeudi Midi</th>
-    <th class="centered">Vendredi Midi</th>
-    <th class="centered">Vendredi Soir</th>
-    <th class="centered">Samedi Midi</th>
-    <th class="centered">Dimanche Midi</th>
-
-  </tr>
-</div>
-
-<?php
-// Initialiser la session
-session_start();
-include "config.php";
-// Vérifiez si l'utilisateur est connecté, sinon redirigez-le vers la page de connexion
-if (isset($_SESSION["username"])) {
-    // Vérification de la connexion
-    /*if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-    } else {
-    echo "Connexion réussie";
-    }*/
-
-    $sql = "SELECT * FROM benevoles";
-    $result = $conn->query($sql);
-
-    // Étape 3 : Afficher les résultats
-    if ($result->num_rows > 0) {
-        // Parcourir les lignes de résultat
-        while ($row = $result->fetch_assoc()) {
-            // Afficher chaque ligne de résultat dans une nouvelle rangée du tableau
-            echo "<tr>";
-            echo "<td>" . $row["ID"] . "</td>";
-            echo "<td>" . $row["first_name"] . "</td>";
-            echo "<td>" . $row["family_name"] . "</td>";
-            echo "<td>" . ($row["vege"] == 1 ? "oui" : "non") . "</td>";
-            echo "<td>" . ($row["RJM"] == 1 ? "oui" : "non") . "</td>";
-            echo "<td>" . ($row["RVM"] == 1 ? "oui" : "non") . "</td>";
-            echo "<td>" . ($row["RVS"] == 1 ? "oui" : "non") . "</td>";
-            echo "<td>" . ($row["RSM"] == 1 ? "oui" : "non") . "</td>";
-            echo "<td>" . ($row["RDM"] == 1 ? "oui" : "non") . "</td>";
-            echo "</tr>";
-        }
-        // Fermer le tableau
-        echo "</>";
-    } else {
-        echo "0 résultats";
-    }
-    
-
-
-    // Étape 4 : Fermer la connexion
-    $conn->close();
-
-    ?>
-
-        <!-- Si l'utilisateur n'est pas connecté-->
-        <?php
-} else {
-
-    header("Location:index.php");
-
-    exit();
-}
-?>
-    </body>
-
-    <footer>
+    <?php include "header.php"?>
+    <body>
         <div class="container">
             <div class="row">
-                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
-                    
+                <div position="relative">
+                    <button type="button" value="Saisir " name="saisir" class="box-button" onClick="window.location.href='listing.php'">Listing</button>&nbsp;
                 </div>
-            </div>
+            <div>
         </div>
-    </footer>
+        <?php
+        // Initialiser la session
+        session_start();
+        include "config.php";
+        // Vérifiez si l'utilisateur est connecté, sinon redirigez-le vers la page de connexion
+        if (isset($_SESSION["username"])) {            
+            // Requête SQL pour obtenir le COUNT pour chaque colonne RJM à RDM
+            $sql = "SELECT COUNT(CASE WHEN RJM = 1 THEN 1 END) AS RJM_count,
+                    COUNT(CASE WHEN RJM = 2 THEN 2 END) AS RJM_count_pris,
+                    COUNT(CASE WHEN RVM = 1 THEN 1 END) AS RVM_count,
+                    COUNT(CASE WHEN RVM = 2 THEN 2 END) AS RVM_count_pris,
+                    COUNT(CASE WHEN RVS = 1 THEN 1 END) AS RVS_count,
+                    COUNT(CASE WHEN RVS = 2 THEN 2 END) AS RVS_count_pris,
+                    COUNT(CASE WHEN RSM = 1 THEN 1 END) AS RSM_count,
+                    COUNT(CASE WHEN RSM = 2 THEN 2 END) AS RSM_count_pris,
+                    COUNT(CASE WHEN RDM = 1 THEN 1 END) AS RDM_count,
+                    COUNT(CASE WHEN RDM = 2 THEN 2 END) AS RDM_count_pris
+                    FROM benevoles";
+
+            $result = $conn->query($sql);
+
+            // Création du tableau
+            echo "<table>";
+            echo "<tr><th>Jour</th><th>Nombre de repas restant</th><th>Nombre de repas pris</th></tr>";
+
+            if ($result->num_rows > 0) {
+            while($row = $result->fetch_assoc()) {
+                echo "<tr><td>Jeudi Midi</td><td>" . $row['RJM_count'] . "</td><td>" . $row['RJM_count_pris'] . "</td></tr>";
+                echo "<tr><td>Vendredi Midi</td><td>" . $row['RVM_count'] . "</td><td>" . $row['RVM_count_pris'] . "</td></tr>";
+                echo "<tr><td>Vendredi Soir</td><td>" . $row['RVS_count'] . "</td><td>" . $row['RVS_count_pris'] . "</td></tr>";
+                echo "<tr><td>Samedi Midi</td><td>" . $row['RSM_count'] . "</td><td>" . $row['RSM_count_pris'] . "</td></tr>";
+                echo "<tr><td>Dimanche Midi</td><td>" . $row['RDM_count'] . "</td><td>" . $row['RDM_count_pris'] . "</td></tr>";
+            }
+        } else {
+            echo "<tr><td colspan='2'>Aucun résultat trouvé</td></tr>";
+        }
+        echo "</table>";
+        // Fermeture de la connexion à la base de données
+        $conn->close();
+        ?>
+    
+        <!-- Si l'utilisateur n'est pas connecté-->
+        <?php 
+        }else{
+            header("Location: login.php");
+            exit();
+        }
+        ?>
+    </body>
+<!-- Footer -->
+<?php include "footer.php" ?>
+
+
 </html>
