@@ -5,7 +5,8 @@
 	<?php include "link.php"?>
 	<head>
 		<link rel="stylesheet" href="../css/style-qrcode.css" />
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+		<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>-->
     	<script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
 		<!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>-->
 		<script src="instascan.min.js"></script>
@@ -50,16 +51,14 @@
 					let scannedId = "'"+content+"'";
 					//alert(scannedId);
 					// Vérifier si la valeur RJM est égale à 1 pour cet ID
-					let query = "SELECT RJM, vege FROM benevoles WHERE ID = " + scannedId;	
+					//let query = "SELECT RJM, vege FROM benevoles WHERE ID = " + scannedId;	
 
-					jQuery.ajax({
-						url: 'toto.php', // URL du script PHP pour la requête SQL
+					$.ajax({
+						url: 'query.php', // URL du script PHP pour la requête SQL
 						type: 'POST',
 						dataType: 'json',
-						data:{
-							'scannedId': scannedId,
-						},
-						success: function(data, status, xhr) {
+						data: {id: scannedId},
+						success: function(data) {
 							alert('hello');
 							let result = JSON.parse(response.result);
 							let rjmValue = result.rjm;
@@ -78,7 +77,7 @@
 								}
 
 								// Passer la valeur RJM à 2 dans la base de données
-								jQuery.ajax({
+								$.ajax({
 									type: "POST",
 									url: "update.php",
 									data: { "id": scannedId },
@@ -100,6 +99,9 @@
 								document.getElementById('result').textContent = "Repas déjà validé";
 							}
 						}
+						/*error: function(xhr, status, error) {
+							console.log("Une erreur s'est produite lors de la requête Ajax: " + status + " " + error);
+						}*/
 					});
 				});
 				
