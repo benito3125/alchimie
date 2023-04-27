@@ -48,38 +48,94 @@
 </header>
 
 <body>
-    <?php
-        require('config.php');
-        session_start();
-        if (isset($_POST['username'])){
-        $username = stripslashes($_REQUEST['username']);
-        $username = mysqli_real_escape_string($conn, $username);
-        $password = stripslashes($_REQUEST['password']);
-        $password = mysqli_real_escape_string($conn, $password);
-            $query = "SELECT * FROM `users` WHERE username='$username' and password='".hash('sha256', $password)."'";
-        $result = mysqli_query($conn,$query) or die(mysql_error());
-        $rows = mysqli_num_rows($result);
-        if($rows==1){
-            $_SESSION['username'] = $username;
-            header("Location: connect.php");
+    <?php 
+
+        session_start(); 
+
+        include "config.php";
+
+        if (isset($_POST['username']) && isset($_POST['password'])) {
+
+            function validate($data){
+
+               $data = trim($data);
+
+               $data = stripslashes($data);
+
+               $data = htmlspecialchars($data);
+
+               return $data;
+
+            }
+
+            $username = validate($_POST['username']);
+
+            $password = validate($_POST['password']);
+            if (empty($username)) {
+
+                 $message = "Le nom d'utilisateur est incorrect.";
+
+            }else if(empty($password)){
+
+                 $message = "Le mot de passe est incorrect.";
+
+            }else{
+
+                $sql = "SELECT * FROM users WHERE username='$username' AND password='$password'";
+
+                $result = mysqli_query($conn, $sql);
+
+
+                if (mysqli_num_rows($result) === 1) {
+
+                    $row = mysqli_fetch_assoc($result);
+
+                    if ($row['username'] === $username && $row['password'] === $password) {
+
+                        echo "Logged in!";
+                    
+                        $_SESSION['username'] = $row['username'];
+
+
+                        header("Location: connect.php");
+
+                        exit();
+
+                    }else{
+
+                         $message = "Le nom d'utilisateur ou le mot de passe est incorrect.";
+
+                    }
+
+                }else{
+
+                    $message = "Le nom d'utilisateur ou le mot de passe est incorrect.";
+                }
+
+            }
+
         }else{
-            $message = "Le nom d'utilisateur ou le mot de passe est incorrect.";
-        }
+
+            //header("Location: connexion.php");
+
+            //exit();
+
         }
     ?>
+    
     <div position="relative">
-    <form class="box" action="" method="post" name="login" position="relative">
-        <h1 class="box-title">Connexion</h1>
-        <input type="text" class="box-input" name="username" placeholder="Nom d'utilisateur">
-        <input type="password" class="box-input" name="password" placeholder="Mot de passe">
-        <input type="submit" value="Connexion " name="submit" class="box-button">
-        <?php if (! empty($message)) { ?>
-            <p class="errorMessage">
+        <form class="box" action="connexion.php" method="post" name="login" position="relative">
+            <h1 class="box-title">Connexion</h1>
+            <input type="text" class="box-input" name="username" placeholder="Nom d'utilisateur">
+            <input type="password" class="box-input" name="password" placeholder="Mot de passe">
+            <button type="submit" value="Connexion " name="submit" class="box-button">Connexion</button>
+            <?php if (! empty($message)) { ?>
+                <p class="errorMessage">
                 <?php echo $message; ?>
-            </p>
+                </p>
             <?php } ?>
-        </div>
-</form>
+        </form>
+    </div>
 </body>
 
 
