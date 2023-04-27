@@ -2,13 +2,13 @@
 <html>
 
     <!-- Inclusion des scripts et liens -->
-    <?php include "link.php"?>
+    <?php include"link.php"?>
     <head>
         <link rel="stylesheet" href="../css/style.css" />
     </head>
     
     <!-- Page Header -->
-    <?php include "header.php"?>
+    <?php include"header.php"?>
 
     <!-- Navigation -->
 
@@ -89,7 +89,7 @@
     ?>
     
     <div position="relative">
-        <form class="box" action="login.php" method="post" name="login" position="relative">
+        <form class="box" action="connexion.php" method="post" name="login" position="relative">
             <h1 class="box-title">Connexion</h1>
             <input type="text" class="box-input" name="username" placeholder="Nom d'utilisateur">
             <input type="password" class="box-input" name="password" placeholder="Mot de passe">
@@ -105,7 +105,6 @@
 
 
 <!-- Footer -->
-<?php include "footer.php" ?>
-
-
+<?php include"footer.php"?>
+</body>
 </html>

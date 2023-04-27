@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <!-- Inclusion des scripts et liens -->
-    <?php include "link.php"?>
+    <?php include"link.php"?>
     <!-- Navigation -->
 
 <body>
@@ -32,7 +32,7 @@
 
         
     <!-- Header -->
-    <?php include "header.php"?>
+    <?php include"header.php"?>
 
     <div class="container">
         <div class="row">
@@ -69,6 +69,6 @@
     </div>
     <hr>
     <!-- Footer -->
-<?include "footer.php" ?>
+    <?php include"footer.php"?>
 </body>
 </html>
