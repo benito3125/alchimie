@@ -6,12 +6,9 @@
 	<head>
 		<link rel="stylesheet" href="../css/style-qrcode.css" />
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    	<script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
+		<!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>-->
 		<script src="instascan.min.js"></script>
-		<html>
- 
-
 	</head>
     <!-- Navigation -->
     <?php include "nav.php"?>
@@ -55,51 +52,53 @@
 					// Vérifier si la valeur RJM est égale à 1 pour cet ID
 					let query = "SELECT RJM, vege FROM benevoles WHERE ID = " + scannedId;	
 
-					$.ajax({
-						url: 'query.php', // URL du script PHP pour la requête SQL
-						type: 'post',
+					jQuery.ajax({
+						url: 'toto.php', // URL du script PHP pour la requête SQL
+						type: 'POST',
+						dataType: 'json',
 						data:{
-							scannedId: scannedId,
+							'scannedId': scannedId,
 						},
-						success: function(response) {
-						let result = JSON.parse(response);
-						let rjmValue = result.rjm;
-						let vegeValue = result.vege;
-						alert(rjmValue);
-						if (rjmValue == 1) {
-							// Si la valeur RJM est égale à 1
-							if (vegeValue == 1) {
-							// Si la valeur végé est égale à 1
-							document.body.style.backgroundColor = "green";
-							document.getElementById('result').textContent = "Repas validé (végé)";
-							} else {
-							// Si la valeur végé est égale à 0
-							document.body.style.backgroundColor = "orange";
-							document.getElementById('result').textContent = "Repas validé";
-							}
+						success: function(data, status, xhr) {
+							alert('hello');
+							let result = JSON.parse(response.result);
+							let rjmValue = result.rjm;
+							let vegeValue = result.vege;
+							//alert(rjmValue);
+							if (rjmValue == 1) {
+								// Si la valeur RJM est égale à 1
+								if (vegeValue == 1) {
+								// Si la valeur végé est égale à 1
+								document.body.style.backgroundColor = "green";
+								document.getElementById('result').textContent = "Repas validé (végé)";
+								} else {
+								// Si la valeur végé est égale à 0
+								document.body.style.backgroundColor = "orange";
+								document.getElementById('result').textContent = "Repas validé";
+								}
 
-							// Passer la valeur RJM à 2 dans la base de données
-							$.ajax({
-                                type: "post",
-                                url: "update.php",
-                                data: { id: scannedId },
-                                success: function(response) {
-                                    // Afficher la réponse de la requête d'update
-                                    console.log(response);
-                                },
-                                error: function(xhr, status, error) {
-                                    console.error(error);
-                                }
-                            });
-						} else if (rjmValue == 0) {
-							// Si la valeur RJM est égale à 0
-							document.body.style.backgroundColor = "red";
-							document.getElementById('result').textContent = "Pas de repas prévu";
-						} else {
-							// Si la valeur RJM est égale à 2
-							document.body.style.backgroundColor = "red";
-							document.getElementById('result').textContent = "Repas déjà validé";
-						}
+								// Passer la valeur RJM à 2 dans la base de données
+								jQuery.ajax({
+									type: "POST",
+									url: "update.php",
+									data: { "id": scannedId },
+									success: function(response) {
+										// Afficher la réponse de la requête d'update
+										console.log(response);
+									},
+									error: function(xhr, status, error) {
+										console.error(error);
+									}
+								});
+							} else if (rjmValue == 0) {
+								// Si la valeur RJM est égale à 0
+								document.body.style.backgroundColor = "red";
+								document.getElementById('result').textContent = "Pas de repas prévu";
+							} else {
+								// Si la valeur RJM est égale à 2
+								document.body.style.backgroundColor = "red";
+								document.getElementById('result').textContent = "Repas déjà validé";
+							}
 						}
 					});
 				});

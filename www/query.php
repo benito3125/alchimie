@@ -2,14 +2,16 @@
 	session_start();
 	// Vérifiez si l'utilisateur est connecté, sinon redirigez-le vers la page de connexion
 	include "config.php";
+    echo('toto');
     if (isset($_SESSION["username"])) {
+        echo('username');
         if( isset( $_POST['scannedId'] ) ){
             // Récupération de l'ID depuis la requête Ajax
             $id = $_POST['scannedId'];
-            
+            echo($id);
             // Préparation de la requête SQL
-            $sql = "SELECT * FROM benevoles WHERE ID = $id";
-
+            $sql = "SELECT RJM, vege FROM benevoles WHERE ID = $id";
+            echo($sql);
             // Exécution de la requête SQL
             $result = $conn->query($sql);
 
