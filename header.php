@@ -32,6 +32,12 @@ require_once 'resources_acces.php';
                         <a href="onboarding.php">Onboarding</a>
                     </li>
                     <li class="">
+                            <a href="stats.php">Statistiques</a>
+                    </li>
+                    <li class="">
+                            <a href="faq.php">FAQ</a>
+                    </li>
+                    <li class="">
                             <a href="admin.php">Administration</a>
                     </li>
                     <li>
@@ -57,7 +63,7 @@ require_once 'resources_acces.php';
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
                 <div class="site-heading">
-                    <h1>Gestion des repas des Bénévoles de l'Alchimie du Jeu de Toulouse.</h1>
+                    <h1>Outils de l'Accueil de l'Alchimie du Jeu de Toulouse.</h1>
                 </div>
             </div>
         </div>

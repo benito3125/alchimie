@@ -1,24 +1,25 @@
 <!DOCTYPE html>
 <html>
-    <!-- Inclusion des scripts et liens -->
     <?php include "link.php"?>
     <head>
         <link rel="stylesheet" href="../css/style_table.css" />
         <link rel="stylesheet" href="../css/style.css" />
-    </head>
+    </head> 
 
-    <!-- Navigation -->
-    <?php include "nav.php"?>
-
-    <!-- Header -->
     <?php include "header.php"?>
     <body>
-        <?php
-        // Initialiser la session
-        include "config.php";
-        // Vérifiez si l'utilisateur est connecté, sinon redirigez-le vers la page de connexion
+        <?php        
+        try {
+            $pdo = new PDO("mysql:host=".DB_SERVER.";dbname=".DB_NAME,DB_USERNAME,DB_PASSWORD);
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch (PDOException $e) {
+            die("Erreur de connexion à la base de données : " . $e->getMessage());
+        }
+
         if (isset($_SESSION['user'])) {            
-            // Requête SQL pour obtenir le COUNT pour chaque colonne RJM à RDM
+
+            $jours = array("RJM", "RVM", "RVS", "RSM", "RDM");
+
             $sql = "SELECT COUNT(CASE WHEN RJM = 1 THEN 1 END) AS RJM_count,
                     COUNT(CASE WHEN RJM = 2 THEN 2 END) AS RJM_count_pris,
                     COUNT(CASE WHEN RVM = 1 THEN 1 END) AS RVM_count,
@@ -31,38 +32,46 @@
                     COUNT(CASE WHEN RDM = 2 THEN 2 END) AS RDM_count_pris
                     FROM benevoles";
 
-            $result = $conn->query($sql);
+            try {
+                $stmt = $pdo->query($sql);
+                
+                echo "<table>";
+                echo "<tr><th>Jour</th><th>Repas restant</th><th>Repas pris</th><th>Listing</th></tr>";
 
-            // Création du tableau
-            echo "<table>";
-            echo "<tr><th>Jour</th><th>Nombre de repas restant</th><th>Nombre de repas pris</th><th>Repas disponibles</th></tr>";
-
-            if ($result->num_rows > 0) {
-            while($row = $result->fetch_assoc()) {
-                echo "<tr><td>Jeudi Midi</td><td>" . $row['RJM_count'] . "</td><td>" . $row['RJM_count_pris'] . "</td><td><a href='listrjm.php' class='btn'>Listing</a></td></tr>";
-                echo "<tr><td>Vendredi Midi</td><td>" . $row['RVM_count'] . "</td><td>" . $row['RVM_count_pris'] . "</td><td><a href='listrvm.php' class='btn'>Listing</a></td></tr>";
-                echo "<tr><td>Vendredi Soir</td><td>" . $row['RVS_count'] . "</td><td>" . $row['RVS_count_pris'] . "</td><td><a href='listrvs.php' class='btn'>Listing</a></td></tr>";
-                echo "<tr><td>Samedi Midi</td><td>" . $row['RSM_count'] . "</td><td>" . $row['RSM_count_pris'] . "</td><td><a href='listrsm.php' class='btn'>Listing</a></td></tr>";
-                echo "<tr><td>Dimanche Midi</td><td>" . $row['RDM_count'] . "</td><td>" . $row['RDM_count_pris'] . "</td><td><a href='listrdm.php' class='btn'>Listing</a></td></tr>";
+                if ($stmt->rowCount() > 0) {
+                    while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                        foreach ($jours as $jour) {
+                            $linkNonPris = "liste_repas_non_pris.php?jour=$jour";
+                            $linkPris = "liste_repas_pris.php?jour=$jour";
+                            $labelNonPris = "Non pris";
+                            $labelPris = "Pris";
+                            
+                            // Création des boutons dans la colonne Repas disponibles
+                            echo "<tr>";
+                            echo "<td>$jour</td>";
+                            echo "<td>" . $row[$jour . '_count'] . "</td>";
+                            echo "<td>" . $row[$jour . '_count_pris'] . "</td>";
+                            echo "<td>";
+                            echo "<a href='$linkNonPris' class='btn-sm'>$labelNonPris</a>";
+                            echo "<a href='$linkPris' class='btn-sm'>$labelPris</a>";
+                            echo "</td>";
+                            echo "</tr>";
+                        }
+                    }
+                } else {
+                    echo "<tr><td colspan='4'>Aucun résultat trouvé</td></tr>";
+                }
+                echo "</table>";
+            } catch (PDOException $e) {
+                echo "Erreur d'exécution de la requête : " . $e->getMessage();
             }
+            
+            $pdo = null; // Fermeture de la connexion à la base de données
         } else {
-            echo "<tr><td colspan='2'>Aucun résultat trouvé</td></tr>";
-        }
-        echo "</table>";
-        // Fermeture de la connexion à la base de données
-        $conn->close();
-        ?>
-
-        <!-- Si l'utilisateur n'est pas connecté-->
-        <?php 
-        }else{
             header("Location: index.php");
             exit();
         }
         ?>
     </body>
-<!-- Footer -->
-<?php include "footer.php" ?>
-
-
+    <?php include "footer.php" ?>
 </html>
