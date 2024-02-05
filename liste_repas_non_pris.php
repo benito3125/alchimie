@@ -4,6 +4,11 @@
     <head>
         <link rel="stylesheet" href="../css/style_table.css" />
         <link rel="stylesheet" href="../css/style.css" />
+        <style>
+            .center {
+                text-align: center;
+            }
+        </style>
     </head> 
 
     <?php include "header.php"?>
@@ -15,6 +20,13 @@
         // Vérifier si le paramètre 'jour' est défini dans l'URL
         if (isset($_GET['jour']) && in_array($_GET['jour'], ['RJM', 'RVM', 'RVS', 'RSM', 'RDM'])) {
             $jour = $_GET['jour'];
+            $jourLabels = array(
+                'RJM' => 'Jeudi Midi',
+                'RVM' => 'Vendredi Midi',
+                'RVS' => 'Vendredi Soir',
+                'RSM' => 'Samedi Midi',
+                'RDM' => 'Dimanche Midi'
+            );
 
             try {
                 $pdo = new PDO("mysql:host=".DB_SERVER.";dbname=".DB_NAME,DB_USERNAME,DB_PASSWORD);
@@ -24,13 +36,14 @@
                 $sql = "SELECT first_name, family_name FROM benevoles WHERE $jour = 1";
                 $stmt = $pdo->query($sql);
 
-                // Afficher la liste des utilisateurs
-                echo "<h2>Liste des repas non pris pour le jour $jour :</h2>";
-                echo "<ul>";
+                // Afficher la liste des utilisateurs dans un tableau
+                echo "<h2 class='center'>Liste des repas non pris pour le " . $jourLabels[$jour] . " :</h2>";
+                echo "<table>";
+                echo "<tr><th>Prénom</th><th>Nom</th></tr>";
                 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                    echo "<li>" . $row['first_name'] . " - " . $row['family_name'] . "</li>";
+                    echo "<tr><td>" . $row['first_name'] . "</td><td>" . $row['family_name'] . "</td></tr>";
                 }
-                echo "</ul>";
+                echo "</table>";
 
                 $pdo = null; // Fermeture de la connexion à la base de données
             } catch (PDOException $e) {

@@ -50,8 +50,6 @@ try {
     die("Erreur : " . $e->getMessage());
 }
 
-// Stocker l'email de l'utilisateur connecté dans la session
-$_SESSION['user_email'] = "user@example.com";
 
 // Vérifier si le formulaire a été soumis
 if ($_SERVER["REQUEST_METHOD"] === "POST") {

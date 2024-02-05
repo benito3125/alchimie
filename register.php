@@ -14,7 +14,7 @@
 
 <body>
     <?php 
-        require_once "resources_acces.php";
+        //require_once "resources_acces.php";
         require_once "mysql.php";
 
         if (isset($_POST['email']) && isset($_POST['password'])) {
