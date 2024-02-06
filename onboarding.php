@@ -1,5 +1,7 @@
 <?php
+session_start(); // Démarrez la session si ce n'est pas déjà fait
 require_once "config.php";
+
 // Redirection vers la même page pour actualiser le contenu
 function redirectToSelf() {
     header("Location: {$_SERVER['PHP_SELF']}");
@@ -7,10 +9,27 @@ function redirectToSelf() {
 }
 
 // Fonction pour insérer ou mettre à jour une ligne dans la table accessoires en fonction de l'ID_user
-function insererOuMettreAJourLigneAccessoires($id_user, $tshirt, $tshirt_number, $neck_warme, $head) {
+function insererOuMettreAJourLigneAccessoires($id_user, $tshirt, $tshirt_number, $neck_warm, $head) {
     try {
         $conn = new PDO("mysql:host=".DB_SERVER.";dbname=".DB_NAME,DB_USERNAME,DB_PASSWORD);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        // Définir les valeurs par défaut pour :neck_warme et :head
+        $neck_warm_value = 0;
+        $head_value = 0;
+
+        // Assigner les valeurs en fonction des conditions spécifiées
+        if ($neck_warm === 'Violet') {
+            $neck_warm_value = 1;
+        } elseif ($neck_warm === 'Bleu') {
+            $neck_warm_value = 2;
+        }
+
+        if ($head === 'Jaune') {
+            $head_value = 1;
+        } elseif ($head === 'Orange') {
+            $head_value = 2;
+        }
 
         // Requête pour insérer ou mettre à jour une ligne dans la table accessoires
         $sql = "INSERT INTO accessoires (ID_user, Tshirt, tshirt_number, neck_warme, head) 
@@ -21,8 +40,8 @@ function insererOuMettreAJourLigneAccessoires($id_user, $tshirt, $tshirt_number,
         $stmt->bindParam(':id_user', $id_user);
         $stmt->bindParam(':tshirt', $tshirt);
         $stmt->bindParam(':tshirt_number', $tshirt_number);
-        $stmt->bindParam(':neck_warme', $neck_warme);
-        $stmt->bindParam(':head', $head);
+        $stmt->bindParam(':neck_warme', $neck_warm_value); // Utilisation de la valeur calculée
+        $stmt->bindParam(':head', $head_value); // Utilisation de la valeur calculée
         $stmt->execute();
     } catch(PDOException $e) {
         echo "Erreur : " . $e->getMessage();
@@ -33,7 +52,8 @@ function insererOuMettreAJourLigneAccessoires($id_user, $tshirt, $tshirt_number,
 }
 
 // Fonction pour afficher les informations du bénévole et le bouton "Accepter"
-function afficherInformationsBenevole($qr_code) {
+// Fonction pour afficher les informations du bénévole et les boutons "Accepter" et "Modifier"
+function afficherInformationsBenevole($qr_code, $action = "") {
     try {
         $conn = new PDO("mysql:host=".DB_SERVER.";dbname=".DB_NAME,DB_USERNAME,DB_PASSWORD);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -57,7 +77,7 @@ function afficherInformationsBenevole($qr_code) {
                 $neck_warm = 'N/A';
             }
             $head = null;
-            if ($result['comite'] == 1 && $result['LSF'] == 1) {
+            if ($result['responsible'] == 1 && $result['LSF'] == 1) {
                 $head = 'Jaune';
             } elseif ($result['comite'] == 0 && $result['LSF'] == 1) {
                 $head = 'Orange';
@@ -75,11 +95,45 @@ function afficherInformationsBenevole($qr_code) {
             echo "<td><input type='text' name='qr_code' value='$qr_code' readonly class='border_data'></td>";
             echo "<td>" . $result['first_name'] . "</td>";
             echo "<td>" . $result['family_name'] . "</td>";
-            echo "<td><input type='text' name='size' value='$size' readonly class='border_data'></td>";
+
+            // Rendre l'input "size" modifiable si l'action est "modifier"
+            if ($action === "modifier") {
+                echo "<td><input type='text' name='size' value='$size' class='border_data'></td>";
+            } else {
+                echo "<td><input type='text' name='size' value='$size' readonly class='border_data'></td>";
+            }
+
             echo "<td><input type='text' name='tshirt_number' value='$tshirt_number' readonly class='border_data'></td>";
             echo "<td><input type='text' name='neck_warm' value='$neck_warm' readonly class='border_data'></td>";
             echo "<td><input type='text' name='head' value='$head' readonly class='border_data'></td>";
-            echo "<td><button type='submit' name='accepter'>Accepter</button></td>";
+
+            // Afficher le bouton "OK" si l'action est "modifier", sinon afficher les boutons "Accepter" et "Modifier"
+            if ($action === "modifier") {
+                echo "<td>  <button type='submit' name='ok'>
+                                <img src='icons/check.png' alt='ok' width='32' height='32'>
+                            </button>
+                        </td>";
+            } else {
+                echo "<td>  
+                            <button type='submit' name='accepter'>
+                                <img src='icons/check.png' alt='Accepter' width='32' height='32'>
+                            </button>";
+
+                // Vérifier si l'ID du bénévole est présent dans la table accessoires
+                $accessoires_query = $conn->prepare("SELECT * FROM accessoires WHERE ID_user = :ID_user");
+                $accessoires_query->bindParam(':ID_user', $qr_code);
+                $accessoires_query->execute();
+                $accessoire_result = $accessoires_query->fetch(PDO::FETCH_ASSOC);
+                
+                // Si l'ID est trouvé, afficher le bouton "Modifier"
+                if ($accessoire_result) {
+                    echo "  <button type='submit' name='modifier'>
+                                <img src='icons/change.png' alt='modifier' width='32' height='32'>
+                            </button>
+                ";
+                }
+                echo "</td>";
+            }
             echo "</form>";
             echo "</tr>";
             echo "</table>";
@@ -93,6 +147,7 @@ function afficherInformationsBenevole($qr_code) {
     // Fermeture de la connexion
     $conn = null;
 }
+
 
 // Fonction pour calculer le nombre de t-shirts en fonction de la taille
 function calculerNombreTshirt($size) {
@@ -114,25 +169,74 @@ function calculerNombreTshirt($size) {
     }
 }
 
+// Fonction pour mettre à jour la valeur de "size" dans la table "benevoles"
+function mettreAJourTailleBenevole($id_user, $new_size) {
+    try {
+        $conn = new PDO("mysql:host=".DB_SERVER.";dbname=".DB_NAME,DB_USERNAME,DB_PASSWORD);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        // Requête pour mettre à jour la valeur de "size" dans la table "benevoles"
+        $sql = "UPDATE benevoles SET size = :new_size WHERE ID = :id_user";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':id_user', $id_user);
+        $stmt->bindParam(':new_size', $new_size);
+        $stmt->execute();
+    } catch(PDOException $e) {
+        echo "Erreur : " . $e->getMessage();
+    }
+
+    // Fermeture de la connexion
+    $conn = null;
+}
+
 // Traitement du formulaire
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST["qr_code"]) && !empty($_POST["qr_code"])) {
         $qr_code = $_POST["qr_code"];
+        
+        // Gestion de l'action "modifier"
+        if (isset($_POST["modifier"])) {
+            afficherInformationsBenevole($qr_code, "modifier");
+        } elseif (isset($_POST["ok"])) { // Gestion de l'action "ok"
+            $id_user = $_POST['qr_code'];
+            $tshirt = $_POST['size'];
+            $tshirt_number = $_POST['tshirt_number'];
+            $neck_warm = $_POST['neck_warm'];
+            $head = $_POST['head'];
+            
+            // Mettre à jour la taille dans la table "benevoles"
+        mettreAJourTailleBenevole($id_user, $tshirt);
+
+        // Recalculer le nombre de t-shirts en fonction de la nouvelle taille
+        $tshirt_number = calculerNombreTshirt($tshirt);
+
+        // Réafficher les informations du bénévole après avoir inséré ou mis à jour les données
         afficherInformationsBenevole($qr_code);
+
+            afficherInformationsBenevole($qr_code);
+        } elseif (isset($_POST["accepter"])) { // Gestion de l'action "accepter"
+            $id_user = $_POST['qr_code'];
+            $tshirt = $_POST['size'];
+            $tshirt_number = $_POST['tshirt_number'];
+            $neck_warm = $_POST['neck_warm'];
+            $head = $_POST['head'];
+            
+            // Insérer ou mettre à jour les données dans la table "accessoires"
+            insererOuMettreAJourLigneAccessoires($id_user, $tshirt, $tshirt_number, $neck_warm, $head);
+            
+            // Rafraîchir la page
+            header("Location: {$_SERVER['PHP_SELF']}");
+            exit();
+        } else {
+            afficherInformationsBenevole($qr_code);
+        }
     } else {
         echo "<p>Le champ QR code n'a pas été correctement rempli.</p>";
     }
-    if (array_key_exists('accepter', $_POST)){
-        $id_user = $_POST['qr_code'];
-        $tshirt = $_POST['size'];
-        $tshirt_number = $_POST['tshirt_number'];
-        $neck_warm = $_POST['neck_warm'];
-        $head = $_POST['head'];
-        insererOuMettreAJourLigneAccessoires($id_user, $tshirt, $tshirt_number, $neck_warm, $head);
-        $_SESSION['hide_table'] = true; // Définir la variable de session pour cacher le tableau
-        redirectToSelf();
-    }
 }
+
+
+
 ?>
 
 <!DOCTYPE html>
@@ -206,6 +310,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         h2 {
             margin-top: 0;
+            font-size: 39px; /* Vous pouvez ajuster la taille en fonction de vos préférences */
+        }
+
+        p {
+            font-size: 36px; /* Vous pouvez ajuster la taille en fonction de vos préférences */
         }
         .container {
             width: 50   %;
@@ -257,15 +366,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     </style>
 </head>
+
 <body>
     <h2>Formulaire de fournitures du bénévole</h2>
-
     <div class="container">
+    <div>
         <!-- Contenu du formulaire -->
         <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
             <input type="text" id="qr_code" name="qr_code" placeholder="QR code du bénévole" class ="border_input">
             <input type="submit" value="Envoyer">
         </form>
+    </div>
+    <div style="flex-basis: 48%;">
+        <ol style="text-align: left;">
+            <li>Récupérer le badge du bénévole</li>
+            <li>Scanner son QR-Code</li>
+            <li>Préciser au bénévole la taille, si besoin la modifier avec l'outil</li>
+            <li>Donner le numéro de t-shirt correspondant et des autres accessoires le cas échéant.</li>
+            <li>Ne valider que lorsque le matériel a été donné !</li>
+        </ol>
+    </div>
+</div>
+
+</div>
+
+        </div>
+
     </div>
 
     <!-- Bouton Retour -->
