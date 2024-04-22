@@ -2,7 +2,7 @@
     // Informations d'identification
     define('DB_SERVER', 'bb621576-002.eu.clouddb.ovh.net:35512');
     define('DB_USERNAME', 'admin');
-    define('DB_PASSWORD', 'Benjamin31');
+    define('DB_PASSWORD', 'XXXXXXXXXXX');
     define('DB_NAME', 'repas');
     
     // Connexion à la base de données MySQL 
