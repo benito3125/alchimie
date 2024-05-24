@@ -1,8 +1,8 @@
 <head>
-    <title>Accueil bénévoles</title>
+    <title>Responsables Alchimie</title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Repas des Bénévoles">
     <meta name="keywords" content="repas, jeu, festival, toulouse, alchimie, bénévoles">
     <meta name="generator" content="Batflat" />
@@ -27,4 +27,6 @@
     <link rel="stylesheet" href="https://benevoles.alchimiedujeu.fr/themes/batblog/css/style.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/56fa629212.css">
     <link rel="stylesheet" href="https://benevoles.alchimiedujeu.fr/inc/jscripts/lightbox/lightbox.min.css">
+    <link rel="stylesheet" href="../css/style_table.css" />
+    <link rel="stylesheet" href="../css/style.css" />
 </head>

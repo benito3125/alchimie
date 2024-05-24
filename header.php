@@ -5,6 +5,7 @@ require_once 'mysql.php';
 //require_once 'resources_acces.php';
 
 $NO_PERM_PAGES = array(
+    '/mentions.php',
     '/index.php',
     '/login.php',
     '/register.php'
@@ -12,7 +13,31 @@ $NO_PERM_PAGES = array(
 
 // User Roles creation
 $ROLES = array(
+    'visiteur' => array(
+        '/mentions.php',
+        '/connecte.php',
+        '/stats_fournitures.php',
+        '/faq.php'
+    ),
+    'benevole_accueil' => array(
+        '/mentions.php',
+        '/connecte.php',
+        '/stats_fournitures.php',
+        '/faq.php',
+        '/benevole.php',
+        '/onboarding.php',
+        '/outboarding.php',
+        '/find_users.php'
+    ),
     'admin' => array(
+        '/find_users.php',
+        '/outboarding.php',
+        '/saisir.php',
+        '/checkGuestQuery.php',
+        '/config.php',
+        '/visiteurs.php',
+        '/mentions.php',
+        '/stats_public.php',
         '/connecte.php',
         '/admin.php',
         '/faq.php',
@@ -25,9 +50,15 @@ $ROLES = array(
         '/neck_warme.php',
         '/liste_repas_pris.php',
         '/liste_repas_non_pris.php',
-        '/link.php'
+        '/faq.php',
+        '/benevole.php'
     ),
     'accueil' => array(
+        '/find_users.php',
+        '/outboarding.php',
+        '/visiteurs.php',
+        '/mentions.php',
+        '/stats_public.php',
         '/connecte.php',
         '/faq.php',
         '/stats.php',
@@ -36,9 +67,14 @@ $ROLES = array(
         '/tableau_tshirt.php',
         '/serre_tete.php',
         '/neck_warme.php',
-        '/onboarding.php'
+        '/onboarding.php',
+        '/benevole.php'
     ),
     'comite' => array(
+        '/find_users.php',
+        '/visiteurs.php',
+        '/mentions.php',
+        '/stats_public.php',
         '/connecte.php',
         '/stats.php',
         '/faq.php',
@@ -48,7 +84,15 @@ $ROLES = array(
         '/serre_tete.php',
         '/neck_warme.php',
         '/liste_repas_pris.php',
-        '/liste_repas_non_pris.php'
+        '/liste_repas_non_pris.php',
+        '/benevole.php'
+    ),
+    'cuisine' => array(
+        '/mentions.php',
+        '/connecte.php',
+        '/stats_fournitures.php',
+        '/faq.php',
+        '/saisir.php'
     )
 );
 
@@ -87,6 +131,9 @@ if (!in_array($current_page, $NO_PERM_PAGES)) {
 }
 ?>
 
+<!DOCTYPE html>
+<html lang="fr">
+
 <!-- Navigation -->
 <nav class="navbar navbar-default navbar-custom">
     <div class="container">
@@ -106,9 +153,14 @@ if (!in_array($current_page, $NO_PERM_PAGES)) {
                     <li class="">
                         <a href="connecte.php">Accueil</a>
                     </li>
+                    <?php if ($userRole === 'cuisine' || $userRole === 'admin'): ?>
+                    <li class="">
+                        <a href="saisir.php">Scan</a>
+                    </li>
+                    <?php endif; ?>
                     <?php if ($userRole === 'accueil' || $userRole === 'admin'): ?>
                     <li class="">
-                        <a href="onboarding.php">Onboarding</a>
+                        <a href="benevole.php">Gestion Benevole</a>
                     </li>
                     <?php endif; ?>
                     <?php if ($userRole === 'comite' || $userRole === 'admin' || $userRole === 'accueil'): ?>
@@ -151,5 +203,7 @@ if (!in_array($current_page, $NO_PERM_PAGES)) {
                 </div>
             </div>
         </div>
+        
     </div>
+    
 </header>

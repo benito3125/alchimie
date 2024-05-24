@@ -1,13 +1,9 @@
 <!DOCTYPE html>
 <html>
+<head>
     <!-- Inclusion des scripts et liens -->
     <?php include "link.php"?>
-    <!-- Navigation -->
-
-<head>
     <title>Statistiques des t-shirts</title>
-    <link rel="stylesheet" href="../css/style_table.css" />
-    <link rel="stylesheet" href="../css/style.css" />
     <style>
         .accordion {
             background-color: #eee;
@@ -36,53 +32,65 @@
     </style>
 </head>
 <body>
+    <?php include_once "header.php" ?>
 
-<?php include_once "header.php" ?>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <h2>Statistiques des fournitures</h2>
 
-<div class="container">
-    <div class="row">
-        <div class="col-sm-12">
-            <h2>Statistiques des fournitures</h2>
+                <!-- Statistiques des bracelets-->
+                <button class="accordion">Bracelets</button>
+                <div class="panel">
+                    <h3></h3>
+                    <?php
+                    $totalInitialBracelet = 800;
+                    require_once 'mysql.php';
 
-            <!-- Ajout d'une entrée pour les t-shirts -->
-            <button class="accordion">T-shirts</button>
-            <div class="panel">
-                <?php include "tableau_tshirt.php" ?>
-            </div>            
+                    try {
+                        $conn = new PDO("mysql:host=".DB_SERVER.";dbname=".DB_NAME, DB_USERNAME, DB_PASSWORD);
+                        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-            <!-- Ajout d'une entrée pour les serre-têtes -->
-            <button class="accordion">Serre-têtes</button>
-            <div class="panel">
-                <?php include "serre_tete.php" ?>
+                        // Requête SQL pour obtenir le total après soustraction
+                        $sqlTotalApresSoustraction = "SELECT COUNT(*) AS total_bracelet FROM accessoires WHERE bracelet = 1";
+                        $stmtTotalApresSoustraction = $conn->prepare($sqlTotalApresSoustraction);
+                        $stmtTotalApresSoustraction->execute();
+                        $totalBracelet = $stmtTotalApresSoustraction->fetch(PDO::FETCH_ASSOC)['total_bracelet'];
+
+                        // Affichage des totaux
+                        echo "<p>Total initial : $totalInitialBracelet</p>";
+                        echo "<p>Total restant : " . ($totalInitialBracelet - $totalBracelet) . "</p>";
+
+                    } catch(PDOException $e) {
+                        echo "Erreur : " . $e->getMessage();
+                    }
+                    ?>
+                </div>
+                <!-- Ajout d'une entrée pour les t-shirts -->
+                <button class="accordion">T-shirts</button>
+                <div class="panel">
+                    <?php include "tableau_tshirt.php" ?>
+                </div>            
+
+                <!-- Ajout d'une entrée pour les serre-têtes -->
+                <button class="accordion">Serre-têtes</button>
+                <div class="panel">
+                    <?php include "serre_tete.php" ?>
+                </div>
+                
+                <!-- Ajout d'une entrée pour les tour de cou -->
+                <button class="accordion">Tour de cou</button>
+                <div class="panel">
+                    <?php include "neck_warme.php" ?>
+                </div> 
+
+                <!-- Ajout de l'élément pour les statistiques -->
+                
             </div>
-            
-            <!-- Ajout d'une entrée pour les tour de cou -->
-            <button class="accordion">Tour de cou</button>
-            <div class="panel">
-                <?php include "neck_warme.php" ?>
-            </div> 
         </div>
     </div>
-</div>
 
-<script>
-    var acc = document.getElementsByClassName("accordion");
-    var i;
-
-    for (i = 0; i < acc.length; i++) {
-        acc[i].addEventListener("click", function() {
-            this.classList.toggle("active");
-            var panel = this.nextElementSibling;
-            if (panel.style.maxHeight) {
-                panel.style.maxHeight = null;
-            } else {
-                panel.style.maxHeight = panel.scrollHeight + "px";
-            }
-        });
-    }
-</script>
-
-<?php include "footer.php" ?>
-
+    <script src="./js/script_stats_fournitures.js"></script>
+    <?php include "footer.php" ?>
 </body>
 </html>

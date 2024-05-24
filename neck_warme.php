@@ -37,7 +37,6 @@ try {
     echo "<form method='post'>";
     echo "<table border='1'>";
     echo "<tr><th>Couleur</th><th>Total initial</th><th>Total restant</th>";
-    print_r ($_SESSION);
     // Vérification du rôle pour afficher la colonne "Action" uniquement si l'utilisateur est admin
     if ($_SESSION['user'] === 'admin') {
         echo "<th>Action</th>";
@@ -50,7 +49,7 @@ try {
         echo "<tr>";
         echo "<td>$colorLabel</td>";
         // Affichage du champ d'entrée uniquement si l'utilisateur est admin
-        if ($_SESSION['user'] === 'admin') {
+        if ($userRole === 'admin') {
             echo "<td><input type='number' value='{$data['totalInitial']}' name='totalInitial[$color]'></td>";
         } else {
             echo "<td>{$data['totalInitial']}</td>";

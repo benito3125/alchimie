@@ -2,8 +2,7 @@
 <html>
     <!-- Inclusion des scripts et liens -->
     <?php include "link.php"?>
-    <!-- Navigation -->
-
+    
 <body>
             
     <!-- Header -->
@@ -27,11 +26,10 @@
             <div class="col-sm-12 text-center">
                 <a href="stats_repas.php" class="btn btn-orange btn-lg mr-3">Repas</a>
                 <a href="stats_fournitures.php" class="btn btn-gray btn-lg">Fournitures</a>
-                <a href="stats_visiteurs.php" class="btn btn-gray btn-lg ml-3">Bouton 3</a>
+                <a href="visiteurs.php" class="btn btn-gray btn-lg ml-3">visiteurs</a>
             </div>
         </div>
     </div>
-    <hr>
     <!-- Footer -->
 <?include "footer.php" ?>
 </body>

@@ -33,7 +33,7 @@
                 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
                 // Requête SQL pour obtenir la liste des utilisateurs qui n'ont pas pris leur repas
-                $sql = "SELECT first_name, family_name FROM benevoles WHERE $jour = 1";
+                $sql = "SELECT first_name, family_name FROM benevoles_2024 WHERE $jour = 1";
                 $stmt = $pdo->query($sql);
 
                 // Afficher la liste des utilisateurs dans un tableau

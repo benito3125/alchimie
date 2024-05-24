@@ -36,7 +36,7 @@ try {
     echo "<table border='1'>";
     echo "<tr><th>Couleur</th><th>Total initial</th><th>Total restant</th>";
     // Vérification du rôle pour afficher la colonne "Action" uniquement si l'utilisateur est admin
-    if ($_SESSION['user'] === 'admin') {
+    if ($userRole === 'admin') {
         echo "<th>Action</th>";
     }
     echo "</tr>";

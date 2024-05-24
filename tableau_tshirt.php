@@ -1,11 +1,7 @@
 <?php
-// Vérifiez si l'utilisateur est connecté et s'il a le rôle d'admin
-if (isset($_SESSION['user']) && $_SESSION['user'] === 'admin') {
-    // Récupérez le rôle de l'utilisateur à partir de la session
-    $role = $_SESSION['user'];
-} else {
-    $role = 'user'; // Définissez un rôle par défaut si l'utilisateur n'est pas authentifié ou n'a pas le rôle d'admin
-}
+
+require_once 'mysql.php';
+require_once 'header.php';
 
 // Fonction pour compter le nombre de t-shirts par taille
 function countTShirtsBySize($size, $pdo) {
@@ -34,7 +30,7 @@ try {
         echo "<tr>";
         echo "<td>$size_orange</td>";
         // Afficher la valeur seulement si l'utilisateur est admin
-        if ($role === 'admin') {
+        if ($userRole === 'admin') {
             echo "<td><input type='number' name='$size_orange' value='$totalInitial'></td>";
         } else {
             echo "<td>$totalInitial</td>"; // Afficher la valeur sans champ modifiable
