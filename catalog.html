@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Catalogue — Alchimie du Jeu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="./assets/ui.css" rel="stylesheet">
+  <style>
+    .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
+    .tile{display:block;background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:var(--shadow-sm);text-decoration:none;color:inherit}
+    .tile:hover{box-shadow:var(--shadow-md)}
+    .tile.is-hidden{display:none}
+    .tile .h{display:flex;align-items:center;gap:12px;font-weight:800;font-size:18px;margin-bottom:6px}
+    .tile .muted{color:var(--muted)}
+    .emoji{font-size:22px;line-height:1}
+    
+  </style>
+</head>
+<body>
+  <header class="header"><div id="app-header" class="bar"></div></header>
+
+  <main class="wrap">
+    <section class="notice">
+      <h2>Catalogue des outils</h2>
+      <p class="muted">Les tuiles visibles dépendent de tes droits (rôles globaux et rôles par espace).</p>
+    </section>
+
+    <section class="tiles">
+      <a id="tile-accueil" class="tile" href="./accueil-onboarding.html">
+        <div class="h"><span class="emoji">💛</span> Accueil bénévoles</div>
+        <div class="muted">Gestion et outils de l’accueil.</div>
+      </a>
+
+      <a id="tile-log" class="tile" href="./logistique-stocks.html">
+        <div class="h"><span class="emoji">📦</span> Logistique</div>
+        <div class="muted">Outils logistiques (stocks, planning, etc.).</div>
+      </a>
+
+      <a id="tile-admin" class="tile" href="./admin-accounts.html">
+        <div class="h"><span class="emoji">🛠️</span> Administration</div>
+        <div class="muted">Comptes, festival et stocks.</div>
+      </a>
+
+      <a id="tile-repas" class="tile" href="./repas.html">
+        <div class="h"><span class="emoji">📊</span> Repas</div>
+        <div class="muted">Gestion des repas sur le festival.</div>
+      </a>
+    </section>
+  </main>
+
+  <footer id="app-footer" class="footer"></footer>
+
+  <script src="./assets/auth.js"></script>
+  <script src="./assets/ui.js"></script>
+  <script>
+    (async () => {
+      try {
+        UI.mountHeader('Catalogue');
+        UI.mountFooter();
+
+        const me = await auth.getUser(); // /api/me.php → { roles:[], spaces:{}, ... }
+
+        // helpers simples
+        const isAdmin = (me.roles || []).includes('admin');
+        const hasSpace = (space, role = null) => {
+          const r = me.spaces && me.spaces[space] || null;
+          if (!r) return false;
+          return role ? (r === role) : true;
+        };
+
+        // règles d’affichage (masque si false)
+        const show = {
+          'tile-accueil': isAdmin || hasSpace('accueil'),     // ex : visible si admin ou lié à l’espace accueil
+          'tile-log'    : isAdmin || hasSpace('logistique'),  // admin ou espace logistique
+          'tile-admin'  : isAdmin,                            // admin only
+          'tile-repas'  : isAdmin || hasSpace('accueil')      // exemple
+        };
+
+        Object.entries(show).forEach(([id, can]) => {
+          const el = document.getElementById(id);
+          if (el) el.classList.toggle('is-hidden', !can);
+        });
+      } catch (e) {
+        console.error(e);
+        // on monte quand même l’entête/le pied, et on laisse toutes les tuiles masquées si besoin
+      }
+    })();
+  </script>
+</body>
+</html>

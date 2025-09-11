@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Onboarding — Accueil bénévoles</title>
+<link rel="icon" href="data:,">
+<style>
+:root{
+  --aaj:#f97316; --aaj2:#7c3aed;
+  --ink:#0b1520; --muted:#6b7280;
+  --bg:#f6f7fb; --card:#fff; --line:#e8ecf2;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,Segoe UI,Arial,sans-serif}
+.header{background:linear-gradient(90deg,var(--aaj) 0%, var(--aaj2) 100%); color:#fff}
+.bar{max-width:1200px;margin:0 auto;padding:12px 16px;display:flex;gap:12px;align-items:center}
+.brand{font-weight:900;letter-spacing:.4px}
+.brand a{color:#fff;text-decoration:none}
+.nav a{display:inline-block;padding:8px 12px;margin:0 2px;color:#fff;text-decoration:none;font-weight:700;border-radius:10px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18)}
+.btn{appearance:none;border:0;border-radius:12px;padding:10px 14px;cursor:pointer;background:#fff;color:#111;font-weight:800}
+.btn.primary{background:var(--aaj);color:#fff}
+.btn.outline{background:#fff;color:var(--aaj);border:1px solid var(--aaj)}
+.btn.muted{background:#eef2f7;color:#111;border:1px solid var(--line)}
+.btn[disabled]{opacity:.55;cursor:not-allowed}
+
+.wrap{max-width:1200px;margin:0 auto;padding:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 18px 40px rgba(12,18,28,.06)}
+h1,h2,h3{margin:.2rem 0 .6rem} h1{font-size:28px} h2{font-size:20px}
+.muted{color:var(--muted)}
+.row{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}
+.grid{display:grid;gap:12px}
+.grid-2{grid-template-columns:repeat(2,1fr)} .grid-3{grid-template-columns:repeat(3,1fr)}
+input,select{width:100%;padding:12px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.kv{display:grid;grid-template-columns:160px 1fr;gap:8px;align-items:center}
+.tag{display:inline-flex;gap:6px;align-items:center;padding:6px 10px;border-radius:999px;background:#eef4ff;color:#0a4;border:1px solid #e6edff;font-weight:800;font-size:12px}
+.badge{display:inline-flex;gap:8px;align-items:center;padding:8px 10px;border:1px dashed var(--line);border-radius:10px;background:#fff}
+.kcolor{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:middle}
+.kcolor.blue{background:#2563eb} .kcolor.orange{background:#f97316}
+.kcolor.violet{background:#7c3aed} .kcolor.yellow{background:#eab308}
+hr.sep{border:0;border-top:1px solid var(--line);margin:10px 0}
+
+/* Checklist */
+.check{display:flex;gap:12px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff}
+.check .state{min-width:28px;height:28px;display:grid;place-items:center;border-radius:999px;font-size:13px;font-weight:900;background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0}
+.check.ok .state{background:#ecfdf5;color:#166534;border-color:#bbf7d0}
+.check.need .state{background:#fff7ed;color:#9a3412;border-color:#fed7aa}
+.help{font-size:12px;color:var(--muted)}
+.right{margin-left:auto;display:flex;gap:8px}
+
+.footer{text-align:center;color:#9aa4b2;padding:22px 0 34px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#111827;color:#fff;padding:10px 14px;border-radius:10px;box-shadow:0 10px 18px rgba(0,0,0,.22);opacity:0;pointer-events:none;transition:opacity .18s}
+.toast.show{opacity:1}
+.small{font-size:12px}
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="bar">
+    <div class="brand"><a href="home.html">Alchimie du Jeu</a></div>
+    <nav class="nav">
+      <!--<a href="dashboard.html">Accueil</a>-->
+      <a href="catalog.html">Acceuil</a>
+    </nav>
+    <div style="flex:1"></div>
+    <button class="btn outline" onclick="logout()">Déconnexion</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="card" style="margin-bottom:18px">
+    <h1>Onboarding — Accueil bénévoles</h1>
+    <p class="muted">Scanne/saisis le <strong>n° de badge</strong>, vérifie le profil puis distribue les équipements. Démo 100% <em>localStorage</em>.</p>
+    <div class="row" style="margin-top:8px">
+      <div class="grid">
+        <label>Numéro de badge (scan/code)
+          <input id="inp-badge" placeholder="Ex: B1001" list="dl-badges" autocomplete="off">
+          <datalist id="dl-badges"></datalist>
+        </label>
+        <div class="help">Astuce : filtre par nom/prénom ci-dessous.</div>
+        <label>Rechercher par nom/prénom
+          <input id="inp-search" placeholder="Ex: martin, alice..." autocomplete="off">
+        </label>
+      </div>
+      <div class="grid">
+        <div class="card" style="height:100%">
+          <h3 style="margin-top:0">Raccourcis</h3>
+          <div class="grid grid-2">
+            <button class="btn muted" onclick="fillDemo('B1001')">🎯 B1001</button>
+            <button class="btn muted" onclick="fillDemo('B1002')">🎯 B1002</button>
+          </div>
+          <div class="grid grid-2" style="margin-top:8px">
+            <button class="btn muted" onclick="fillDemo('B1003')">🎯 B1003</button>
+            <button class="btn muted" onclick="fillDemo('B1004')">🎯 B1004</button>
+          </div>
+          <div class="grid grid-2" style="margin-top:8px">
+            <button class="btn muted" onclick="fillDemo('B1005')">🎯 B1005</button>
+            <button class="btn muted" onclick="fillDemo('B1006')">🎯 B1006 (mineur)</button>
+          </div>
+          <div class="grid" style="margin-top:8px">
+            <button class="btn muted" onclick="resetAll()">↺ Réinitialiser (démo)</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="row">
+    <div class="card" id="col-left">
+      <h2>Fiche bénévole</h2>
+      <div id="vol-card" class="grid"></div>
+    </div>
+
+    <div class="card" id="col-right">
+      <h2>Distribution</h2>
+      <div id="steps" class="grid"></div>
+      <hr class="sep">
+      <div style="display:flex;gap:8px;align-items:center">
+        <button id="btn-final" class="btn primary" disabled>✅ Finaliser l’onboarding</button>
+        <button id="btn-reset-v" class="btn muted" disabled>↺ Réinitialiser la fiche</button>
+        <span class="help">Le bouton s’active si tous les éléments <strong>requis</strong> sont OK.</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="footer">© 2025 — Alchimie du Jeu</div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =============================
+   DEMO — base locale
+   Champs:
+   - role: 'benevole' | 'comite'
+   - lsf : 'none' | 'lsf_benevole' | 'lsf_responsable' | 'rlsf_interprete'
+   - age : nombre (années)
+   - tshirt : taille préférée ('', XS..XXL)
+   - kitDone : bool (onboarding finalisé)
+   ============================= */
+const LS_USERS = 'aaj:volunteers.v3';
+const LS_OB_PREFIX = 'aaj:onboard:v2:';
+
+const DEMO = [
+  { badge:'B1001', first:'Alice',  last:'Martin',  role:'benevole', lsf:'lsf_benevole',    age:22, tshirt:'M',  kitDone:false },
+  { badge:'B1002', first:'Bruno',  last:'Leroy',   role:'benevole', lsf:'none',            age:19, tshirt:'',   kitDone:false },
+  { badge:'B1003', first:'Chloé',  last:'Petit',   role:'benevole', lsf:'rlsf_interprete', age:28, tshirt:'S',  kitDone:false },
+  { badge:'B1004', first:'David',  last:'Giral',   role:'comite',   lsf:'lsf_responsable', age:31, tshirt:'XL', kitDone:false },
+  { badge:'B1005', first:'Emile',  last:'Dupuy',   role:'benevole', lsf:'none',            age:34, tshirt:'',   kitDone:false },
+  { badge:'B1006', first:'Fanny',  last:'Noël',    role:'benevole', lsf:'none',            age:16, tshirt:'M',  kitDone:false },
+];
+
+function loadVolunteers(){
+  const raw = localStorage.getItem(LS_USERS);
+  if(!raw){ localStorage.setItem(LS_USERS, JSON.stringify(DEMO)); return DEMO.slice(); }
+  try{ return JSON.parse(raw)||DEMO.slice(); }catch(e){ return DEMO.slice(); }
+}
+function saveVolunteers(list){ localStorage.setItem(LS_USERS, JSON.stringify(list)); }
+function getOb(badge){ const raw = localStorage.getItem(LS_OB_PREFIX+badge); return raw? JSON.parse(raw): null; }
+function setOb(badge, obj){ localStorage.setItem(LS_OB_PREFIX+badge, JSON.stringify(obj)); }
+function clearOb(badge){ localStorage.removeItem(LS_OB_PREFIX+badge); }
+
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+function toast(msg, t=1800){ const el=$('#toast'); el.textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'), t); }
+function logout(){ toast('Déconnexion (démo)'); setTimeout(()=>location.href='home.html',700); }
+
+let USERS = loadVolunteers();
+let CURRENT = null;
+let DIST = null;
+
+/* --- Politiques --- */
+function lanyardPolicy(user){
+  // comité => VIOLET (requis) ; bénévole => non requis
+  if(user.role === 'comite') return {required:true, color:'VIOLET'};
+  return {required:false, color:'AUCUN'};
+}
+function headbandPolicy(user){
+  // LSF → serre-tête couleur (requis si lsf != none)
+  switch(user.lsf){
+    case 'lsf_benevole':     return {required:true, color:'ORANGE', label:'LSF bénévole'};
+    case 'lsf_responsable':  return {required:true, color:'BLEU',   label:'LSF responsable'};
+    case 'rlsf_interprete':  return {required:true, color:'JAUNE',  label:'RLSF interprète'};
+    default:                 return {required:false, color:'AUCUN', label:'—'};
+  }
+}
+function tshirtPolicy(user){
+  // Détermine le T-shirt principal requis et l’optionnel
+  if(user.lsf === 'rlsf_interprete'){
+    return {
+      primary: { kind:'interp_black', label:'Noir Interprètes (requis)' , colorNote:'noir' , required:true },
+      extra:   { kind:'bene_orange',  label:'Orange Bénévoles (optionnel)', colorNote:'orange', required:false }
+    };
+  }
+  if(user.lsf !== 'none'){
+    return {
+      primary: { kind:'lsf_black',    label:'Noir LSF (requis)', colorNote:'noir', required:true },
+      extra:   null
+    };
+  }
+  // pas LSF → orange bénévole requis
+  return {
+    primary: { kind:'bene_orange', label:'Orange Bénévoles (requis)', colorNote:'orange', required:true },
+    extra:   null
+  };
+}
+
+/* --- State builders --- */
+function buildEmptyDist(u){
+  const lp = lanyardPolicy(u);
+  const hp = headbandPolicy(u);
+  const tp = tshirtPolicy(u);
+  return {
+    badge: u.badge,
+    // Tours de cou
+    lanyard: false,
+    lanyardColor: lp.color,        // VIOLET ou AUCUN
+    lanyardRequired: lp.required,
+    // Serre-tête (LSF)
+    headband: false,
+    headbandColor: hp.color,       // ORANGE / BLEU / JAUNE / AUCUN
+    headbandRequired: hp.required,
+    headbandLabel: hp.label,
+    // Bracelet
+    wristband: false,
+    // T-shirt(s)
+    tshirtSize: u.tshirt||'',
+    tshirtPrimaryId: '',
+    tshirtPrimaryKind: tp.primary.kind,      // interp_black | lsf_black | bene_orange
+    tshirtPrimaryLabel: tp.primary.label,    // affichage
+    tshirtExtraAllowed: !!tp.extra,          // si interprète
+    tshirtExtraEnabled: false,               // coché par l’opérateur (optionnel)
+    tshirtExtraId: '',
+    // Mineur
+    isMinor: (u.age!=null && Number(u.age)<18),
+    referentBadge: '',
+    parentalOk: false,
+    // horodatage
+    ts: null
+  };
+}
+
+/* --- UI boot --- */
+function init(){
+  // datalist badges
+  const dl=$('#dl-badges'); dl.innerHTML = USERS.map(u=>`<option value="${u.badge}">${u.first} ${u.last}</option>`).join('');
+
+  $('#inp-search').addEventListener('input', e=>{
+    const v=e.target.value.trim().toLowerCase();
+    const f=USERS.find(u=>(`${u.first} ${u.last}`).toLowerCase().includes(v));
+    if(f){ setVolunteer(f.badge); $('#inp-badge').value=f.badge; }
+  });
+  $('#inp-badge').addEventListener('change', e=> setVolunteer(e.target.value.trim()));
+
+  $('#btn-final').addEventListener('click', finalize);
+  $('#btn-reset-v').addEventListener('click', ()=>{
+    if(!CURRENT) return;
+    clearOb(CURRENT.badge);
+    DIST = buildEmptyDist(CURRENT);
+    render(); toast('Réinitialisé pour '+CURRENT.badge);
+  });
+
+  render();
+}
+document.addEventListener('DOMContentLoaded', init);
+
+/* --- Helpers --- */
+function colorClass(name){
+  switch(name){
+    case 'BLEU': return 'blue';
+    case 'ORANGE': return 'orange';
+    case 'JAUNE': return 'yellow';
+    case 'VIOLET': return 'violet';
+    default: return 'orange';
+  }
+}
+function setVolunteer(badge){
+  const u = USERS.find(x=>x.badge.toLowerCase()===badge.toLowerCase());
+  if(!u){ toast('Badge inconnu'); return; }
+  CURRENT = u;
+  const prev = getOb(u.badge) || {};
+  const fresh = buildEmptyDist(u);
+  DIST = Object.assign(fresh, prev); // conserve ce qui existe, remet à niveau si règles changent
+  render();
+}
+function focusSize(){ $('#sel-size')?.focus(); }
+function saveVolSize(){
+  if(!CURRENT) return;
+  const v=$('#sel-size').value;
+  USERS=loadVolunteers();
+  const me=USERS.find(u=>u.badge===CURRENT.badge);
+  if(me){ me.tshirt=v; saveVolunteers(USERS); }
+  DIST.tshirtSize=v; setOb(DIST.badge, DIST);
+  render(); toast('Taille T-shirt enregistrée : '+(v||'—'));
+}
+function clearVolSize(){ const s=$('#sel-size'); if(s){ s.value=''; saveVolSize(); } }
+function savePrimaryTS(){ DIST.tshirtPrimaryId=$('#inp-ts1')?.value.trim()||''; setOb(DIST.badge, DIST); render(); toast('N° T-shirt principal enregistré.'); }
+function clearPrimaryTS(){ const i=$('#inp-ts1'); if(i) i.value=''; savePrimaryTS(); }
+function toggleExtraTS(){ DIST.tshirtExtraEnabled = !DIST.tshirtExtraEnabled; setOb(DIST.badge, DIST); render(); }
+function saveExtraTS(){ DIST.tshirtExtraId=$('#inp-ts2')?.value.trim()||''; setOb(DIST.badge, DIST); render(); toast('N° T-shirt bénévole (option) enregistré.'); }
+function clearExtraTS(){ const i=$('#inp-ts2'); if(i) i.value=''; saveExtraTS(); }
+function toggle(k){ if(!DIST) return; DIST[k] = !DIST[k]; setOb(DIST.badge, DIST); render(); }
+function changeBadge(){ const i=$('#inp-badge'); i.focus(); i.select(); }
+function fillDemo(b){ $('#inp-badge').value=b; setVolunteer(b); }
+
+function saveReferent(){
+  const v = ($('#inp-ref')?.value||'').trim();
+  if(!v) { toast('Saisis le badge référent'); return; }
+  const ref = USERS.find(u=>u.badge.toLowerCase()===v.toLowerCase());
+  if(!ref){ toast('Référent introuvable'); return; }
+  if(ref.badge===CURRENT.badge){ toast('Le référent ne peut pas être lui-même'); return; }
+  DIST.referentBadge = ref.badge;
+  setOb(DIST.badge, DIST);
+  render(); toast('Référent associé : '+ref.first+' '+ref.last);
+}
+function toggleParental(){ DIST.parentalOk = !DIST.parentalOk; setOb(DIST.badge, DIST); render(); }
+
+function referentStatus(){
+  if(!DIST?.referentBadge) return { ok:false, text:'Aucun référent renseigné' };
+  const ref = USERS.find(u=>u.badge===DIST.referentBadge);
+  if(!ref) return { ok:false, text:'Badge référent introuvable' };
+  return { ok: !!ref.kitDone, text: ref.kitDone ? 'Kit récupéré (OK)' : 'Kit non récupéré' , ref };
+}
+
+/* --- Render --- */
+function render(){
+  const vc = $('#vol-card');
+  if(!CURRENT){
+    vc.innerHTML = `<p class="muted">Scanne/saisis un <strong>n° de badge</strong> pour commencer.</p>`;
+  }else{
+    const lp = lanyardPolicy(CURRENT);
+    const hp = headbandPolicy(CURRENT);
+    const tp = tshirtPolicy(CURRENT);
+    vc.innerHTML = `
+      <div class="kv"><div>N° de badge</div><div class="badge"><strong>${CURRENT.badge}</strong></div></div>
+      <div class="kv"><div>Identité</div><div><strong>${CURRENT.first} ${CURRENT.last}</strong></div></div>
+      <div class="kv"><div>Âge</div><div>${CURRENT.age} ${CURRENT.age<18?'<span class="tag" style="background:#fff0f0;border-color:#ffd3d3;color:#b91c1c">Mineur</span>':''}</div></div>
+      <div class="kv"><div>Rôle</div><div>
+        ${CURRENT.role==='comite'
+          ? `<span class="tag">Membre du comité</span>`
+          : `<span class="tag" style="background:#fff8ee;border-color:#ffe7c2;color:#b45309">Bénévole</span>`}
+      </div></div>
+      <div class="kv"><div>LSF</div><div>
+        ${hp.required
+          ? `<span class="badge"><span class="kcolor ${colorClass(hp.color)}"></span> ${hp.label} — serre-tête <b>${hp.color}</b></span>`
+          : `<span class="badge">—</span>`}
+      </div></div>
+      <div class="kv"><div>Tour de cou</div><div>
+        ${lp.required
+          ? `<span class="badge"><span class="kcolor ${colorClass(lp.color)}"></span> requis : <b>${lp.color}</b></span>`
+          : `<span class="badge">non requis</span>`}
+      </div></div>
+
+      <hr class="sep">
+      <div class="help">La <strong>taille T-shirt</strong> est commune à tous les T-shirts remis.</div>
+      <div class="grid grid-3" style="margin-top:8px">
+        <label>Taille T-shirt
+          <select id="sel-size">
+            <option value="">— choisir —</option>
+            ${['XS','S','M','L','XL','XXL'].map(s=>`<option ${(DIST.tshirtSize===s)?'selected':''}>${s}</option>`).join('')}
+          </select>
+        </label>
+        <button class="btn muted" onclick="saveVolSize()">💾 Enregistrer</button>
+        <button class="btn muted" onclick="clearVolSize()">Effacer</button>
+      </div>
+
+      ${DIST.isMinor ? `
+      <hr class="sep">
+      <h3>Mineur — Référent & autorisation</h3>
+      <div class="grid">
+        <div class="grid grid-3">
+          <label>Badge référent
+            <input id="inp-ref" placeholder="Ex: B1004" value="${DIST.referentBadge||''}" list="dl-badges">
+          </label>
+          <button class="btn outline" onclick="saveReferent()">Associer</button>
+          <div style="display:flex;align-items:center">
+            ${(function(){ const st=referentStatus(); return st.ok ? 
+              '<span class="tag" style="background:#ecfdf5;border-color:#bbf7d0;color:#166534">Kit référent OK</span>' :
+              '<span class="tag" style="background:#fff7ed;border-color:#fed7aa;color:#9a3412">Référent non validé</span>'; })()}
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <button class="btn ${DIST.parentalOk?'muted':'outline'}" onclick="toggleParental()">${DIST.parentalOk?'✅ Autorisation validée':'Valider l’autorisation parentale'}</button>
+          ${DIST.parentalOk?'<span class="tag">OK</span>':'<span class="small muted">Un scan/apposition signature est requis IRL.</span>'}
+        </div>
+      </div>
+      ` : ``}
+    `;
+  }
+
+  // RIGHT COLUMN — STEPS
+  const sc = $('#steps');
+  if(!CURRENT){
+    sc.innerHTML = `<p class="muted">La checklist apparaîtra ici.</p>`;
+    $('#btn-final').disabled = true; $('#btn-reset-v').disabled = true; return;
+  }
+
+  const showLanyard  = DIST.lanyardRequired;
+  const showHeadband = DIST.headbandRequired;
+  const sizeInfo = DIST.tshirtSize ? `<b>${DIST.tshirtSize}</b>` : '<span class="muted">non renseignée</span>';
+
+  sc.innerHTML = `
+    <div class="check ok">
+      <div class="state">✔</div>
+      <div>
+        <div><strong>Badge scanné</strong> — ${CURRENT.badge} · ${CURRENT.first} ${CURRENT.last}</div>
+        <div class="help">Étape automatique.</div>
+      </div>
+      <div class="right"><button class="btn muted" onclick="changeBadge()">Changer</button></div>
+    </div>
+
+    ${ showLanyard ? `
+    <div class="check ${DIST.lanyard?'ok':'need'}">
+      <div class="state">${DIST.lanyard?'✔':'!'}</div>
+      <div>
+        <div><strong>Tour de cou</strong> — <span class="badge"><span class="kcolor ${colorClass(DIST.lanyardColor)}"></span> ${DIST.lanyardColor}</span></div>
+        <div class="help">Requis pour les membres du <b>comité</b>.</div>
+      </div>
+      <div class="right"><button class="btn ${DIST.lanyard?'muted':'outline'}" onclick="toggle('lanyard')">${DIST.lanyard?'Annuler':'Distribuer'}</button></div>
+    </div>` : `
+    <div class="check ok"><div class="state">✔</div><div><strong>Tour de cou</strong> — <span class="badge">non requis (bénévole)</span></div></div>` }
+
+    <div class="check ${DIST.wristband?'ok':'need'}">
+      <div class="state">${DIST.wristband?'✔':'!'}</div>
+      <div>
+        <div><strong>Bracelet bénévole</strong></div>
+        <div class="help">Toujours requis.</div>
+      </div>
+      <div class="right"><button class="btn ${DIST.wristband?'muted':'outline'}" onclick="toggle('wristband')">${DIST.wristband?'Annuler':'Distribuer'}</button></div>
+    </div>
+
+    ${ showHeadband ? `
+    <div class="check ${DIST.headband?'ok':'need'}">
+      <div class="state">${DIST.headband?'✔':'!'}</div>
+      <div>
+        <div><strong>Serre-tête (LSF)</strong> — <span class="badge"><span class="kcolor ${colorClass(DIST.headbandColor)}"></span> ${DIST.headbandColor}</span></div>
+        <div class="help">LSF bénévole = orange · LSF responsable = bleu · RLSF interprète = jaune.</div>
+      </div>
+      <div class="right"><button class="btn ${DIST.headband?'muted':'outline'}" onclick="toggle('headband')">${DIST.headband?'Annuler':'Distribuer'}</button></div>
+    </div>` : `
+    <div class="check ok"><div class="state">✔</div><div><strong>Serre-tête (LSF)</strong> — <span class="badge">non requis</span></div></div>` }
+
+    <div class="check ${(DIST.tshirtSize)?'ok':'need'}">
+      <div class="state">${(DIST.tshirtSize)?'✔':'!'}</div>
+      <div>
+        <div><strong>T-shirt — taille commune</strong> : ${sizeInfo}</div>
+        <div class="help">Sélectionne/Enregistre la taille dans la fiche (gauche).</div>
+      </div>
+      <div class="right"><button class="btn muted" onclick="focusSize()">Modifier</button></div>
+    </div>
+
+    <!-- T-shirt principal -->
+    <div class="check ${(DIST.tshirtPrimaryId && DIST.tshirtSize)?'ok':'need'}">
+      <div class="state">${(DIST.tshirtPrimaryId && DIST.tshirtSize)?'✔':'!'}</div>
+      <div style="flex:1">
+        <div><strong>T-shirt principal</strong> — ${DIST.tshirtPrimaryLabel}</div>
+        <div class="grid grid-3" style="margin-top:6px">
+          <input id="inp-ts1" placeholder="N° / QR" value="${DIST.tshirtPrimaryId||''}">
+          <button class="btn outline" onclick="savePrimaryTS()">Enregistrer</button>
+          <button class="btn muted" onclick="clearPrimaryTS()">Effacer</button>
+        </div>
+        <div class="help">Couleur selon le profil : interprètes/LSF = noir ; sinon = orange.</div>
+      </div>
+    </div>
+
+    <!-- T-shirt optionnel pour interprètes -->
+    ${ DIST.tshirtExtraAllowed ? `
+    <div class="check ${(DIST.tshirtExtraEnabled ? (DIST.tshirtExtraId && DIST.tshirtSize) : true) ? 'ok':'need'}">
+      <div class="state">${(DIST.tshirtExtraEnabled ? (DIST.tshirtExtraId && DIST.tshirtSize) : true) ? '✔':'!'}</div>
+      <div style="flex:1">
+        <div><strong>Deuxième T-shirt (optionnel)</strong> — Orange bénévole (même taille)</div>
+        <div class="help">Réservé aux interprètes : coche si demandé, la taille est identique au principal.</div>
+        <div class="grid" style="margin-top:6px">
+          <label><input type="checkbox" id="cb-extra" ${DIST.tshirtExtraEnabled?'checked':''} onchange="toggleExtraTS()"> Donner un T-shirt bénévole en plus</label>
+        </div>
+        ${ DIST.tshirtExtraEnabled ? `
+          <div class="grid grid-3" style="margin-top:6px">
+            <input id="inp-ts2" placeholder="N° / QR" value="${DIST.tshirtExtraId||''}">
+            <button class="btn outline" onclick="saveExtraTS()">Enregistrer</button>
+            <button class="btn muted" onclick="clearExtraTS()">Effacer</button>
+          </div>
+          <div class="help">Taille utilisée : ${sizeInfo}</div>
+        ` : ``}
+      </div>
+    </div>
+    ` : ``}
+  `;
+
+  // Conditions de finalisation
+  const reqLanyard  = !DIST.lanyardRequired || (DIST.lanyardRequired && DIST.lanyard);
+  const reqHeadband = !DIST.headbandRequired || (DIST.headbandRequired && DIST.headband);
+  const reqWB       = DIST.wristband;
+  const reqSize     = !!DIST.tshirtSize;
+  const reqTS1      = !!DIST.tshirtPrimaryId;
+
+  // extra T-shirt si coché
+  const reqTS2 = DIST.tshirtExtraAllowed && DIST.tshirtExtraEnabled ? !!DIST.tshirtExtraId : true;
+
+  // règles mineur
+  let minorOk = true;
+  if(DIST.isMinor){
+    const st = referentStatus();
+    minorOk = !!(DIST.referentBadge && st.ok && DIST.parentalOk);
+  }
+
+  const canFinalize = (reqLanyard && reqHeadband && reqWB && reqSize && reqTS1 && reqTS2 && minorOk);
+  $('#btn-final').disabled = !canFinalize;
+  $('#btn-reset-v').disabled = false;
+}
+
+function finalize(){
+  // marque kitDone sur le bénévole + enregistre distribution
+  DIST.ts=Date.now(); setOb(DIST.badge, DIST);
+  USERS=loadVolunteers();
+  const me=USERS.find(u=>u.badge===CURRENT.badge);
+  if(me){ me.kitDone = true; saveVolunteers(USERS); }
+  toast(`Onboarding terminé pour ${CURRENT.first} ${CURRENT.last} (${CURRENT.badge})`);
+  setTimeout(()=>location.reload(), 900);
+}
+
+/* RESET DEMO */
+function resetAll(){
+  localStorage.removeItem(LS_USERS);
+  USERS=loadVolunteers();
+  USERS.forEach(u=>localStorage.removeItem(LS_OB_PREFIX+u.badge));
+  CURRENT=null; DIST=null;
+  $('#inp-badge').value=''; $('#inp-search').value='';
+  init(); toast('Données démo réinitialisées');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Administration — Outils</title>
+  <link rel="stylesheet" href="./assets/ui.css">
+</head>
+<body>
+<header class="header"><div id="app-header" class="bar"></div></header>
+
+<main class="wrap">
+  <section class="notice">
+    <h2 id="page-title">Administration</h2>
+    <p class="muted">Espace réservé aux administrateurs.</p>
+    <div class="actions" style="margin-top:10px;">
+      <a class="btn" href="admin-accounts.html">Administration des comptes</a>
+      <button class="btn-outline" onclick="UI.toast('Administration des stocks — à venir')">Administration des stocks</button>
+      <button class="btn-outline" onclick="UI.toast('Administration du festival — à venir')">Administration du festival</button>
+    </div>
+  </section>
+</main>
+
+<footer id="app-footer" class="footer"></footer>
+
+<script src="./assets/auth.js"></script>
+<script src="./assets/ui.js"></script>
+<script>
+  const u = auth.requireAuth(); if(!u) {/*redir via requireAuth*/};
+  if(u && !auth.hasAnyRole(u, ['admin'])){ UI.toast('Réservé aux administrateurs'); location.href='catalog.html'; }
+  UI.mountHeader('Administration');
+  UI.mountFooter();
+</script>
+</body>
+</html>

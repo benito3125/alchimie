@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Accueil — Alchimie du Jeu</title>
+  <link rel="stylesheet" href="./assets/ui.css">
+</head>
+<body>
+<header class="header"><div id="app-header"></div></header>
+
+<main class="wrap">
+  <section class="notice">
+    <h2>Bienvenue sur l’outil de gestion des bénévoles du Festival Alchimie du Jeu de Toulouse.</h2>
+    <p>Site public : <a href="https://alchimiedujeu.fr" target="_blank" rel="noopener">alchimiedujeu.fr</a> — Bénévoles : <a href="mailto:benevoles@alchimiedujeu.fr">benevoles@alchimiedujeu.fr</a></p>
+    <div class="actions">
+      <a class="btn" href="./catalog.html">Aller à l’accueil</a>
+    </div>
+  </section>
+</main>
+
+<footer id="app-footer" class="footer"></footer>
+
+<!-- ordre : auth.js puis ui.js -->
+<script src="./assets/auth.js"></script>
+<script src="./assets/ui.js"></script>
+<script>
+  // Pas d'accès direct à des IDs : on laisse UI monter l'entête et le pied.
+  (async function(){
+    await UI.mountHeader('Accueil'); // attend l’utilisateur et construit la barre
+    UI.mountFooter();
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+Options -Indexes
+
+# Autoriser l'exécution et l'accès aux fichiers PHP de l'API
+<FilesMatch "\.php$">
+  Require all granted
+</FilesMatch>
+
+# CORS: autorise le front tools.alchimiedujeu.fr (ajuste si besoin)
+<IfModule mod_headers.c>
+  Header always set Access-Control-Allow-Origin "https://tools.alchimiedujeu.fr"
+  Header always set Vary "Origin"
+  Header always set Access-Control-Allow-Credentials "true"
+  Header always set Access-Control-Allow-Methods "GET, POST, OPTIONS"
+  Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
+</IfModule>
+
+# Réponse immédiate aux prévols (OPTIONS)
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{REQUEST_METHOD} OPTIONS
+  RewriteRule ^ - [R=204,L]
+</IfModule>

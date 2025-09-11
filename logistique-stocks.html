@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Logistique — Stocks</title>
+<link rel="stylesheet" href="./assets/ui.css">
+<style>
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{border:1px solid var(--line);padding:8px 10px;text-align:left}
+.table th{background:#fafafa}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.badge-space{font-size:12px;color:#fff;background:var(--brand-2);padding:2px 8px;border-radius:999px}
+fieldset{border:1px solid var(--line);border-radius:12px;padding:12px;margin:0 0 12px 0}
+legend{padding:0 6px;font-weight:900;color:var(--brand)}
+</style>
+</head>
+<body>
+<header class="header"><div id="app-header" class="bar"></div></header>
+
+<main class="wrap">
+  <section class="notice">
+    <h2>Gestion des stocks</h2>
+    <p class="muted">Visibilité et droits selon l’espace. Les responsables <strong>logistique</strong> (ou admin) peuvent tout éditer.</p>
+  </section>
+
+  <section class="card">
+    <div class="actions" id="toolbar"></div>
+    <table class="table" id="stock-table">
+      <thead>
+        <tr>
+          <th>Article</th>
+          <th>Espace</th>
+          <th>Catégorie</th>
+          <th>Quantité</th>
+          <th>Tailles</th>
+          <th style="width:260px">Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+</main>
+
+<footer id="app-footer" class="footer"></footer>
+
+<!-- Dépendances -->
+<script src="./assets/auth.js"></script>
+<script src="./assets/ui.js"></script>
+<script src="./assets/store.js"></script>
+
+<script>
+  const user = auth.requireAuth(); // redirige si non connecté
+  UI.mountHeader('Logistique — Stocks');
+  UI.mountFooter();
+
+  const tb = document.querySelector('#stock-table tbody');
+  const toolbar = document.querySelector('#toolbar');
+
+  // Toolbar (ajout réservé resp logistique / admin)
+  if (auth.canAddStock?.(user)) {
+    const btn = document.createElement('button');
+    btn.className = 'btn';
+    btn.textContent = 'Ajouter un article';
+    btn.onclick = openAddItem;
+    toolbar.appendChild(btn);
+  }
+
+  // Rafraîchit quand un autre onglet/page modifie le stock (ex: onboarding)
+  window.addEventListener('stock:changed', render);
+
+  function render() {
+    tb.innerHTML = '';
+    const items = store.getAll();
+    items.forEach(it => {
+      // visibilité selon espace
+      if (auth.canViewStock && !auth.canViewStock(user, it.space)) return;
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><strong>${it.label}</strong><div class="muted" style="font-size:12px">${it.id}</div></td>
+        <td><span class="badge-space">${it.space}</span></td>
+        <td>${it.category||'—'}</td>
+        <td>${it.trackSizes ? '—' : (it.quantity ?? 0)}</td>
+        <td>${it.trackSizes ? renderSizes(it) : '—'}</td>
+        <td class="actions"></td>
+      `;
+      const act = tr.querySelector('.actions');
+      const canEdit = auth.canEditStock?.(user, it.space);
+
+      if (canEdit) {
+        // Edition quantité simple
+        if (!it.trackSizes) {
+          const q = document.createElement('input');
+          q.type = 'number'; q.min = '0'; q.value = it.quantity ?? 0;
+          q.style.width = '90px';
+          q.onchange = ()=> store.setQuantity({ id: it.id, value: q.value });
+          tr.children[3].innerHTML = '';
+          tr.children[3].appendChild(q);
+        }
+
+        // Déplacement d’espace (resp logistique & admin)
+        const isLogResp = (auth.spaceRole?.(user,'logistique') === 'responsable') || auth.isAdmin?.(user);
+        if (isLogResp) {
+          const sel = document.createElement('select');
+          ['accueil','logistique'].forEach(s=>{
+            const o = document.createElement('option');
+            o.value = s; o.textContent = `→ ${s}`;
+            if (s===it.space) o.disabled = true;
+            sel.appendChild(o);
+          });
+          const btnMove = document.createElement('button');
+          btnMove.className = 'btn btn-outline';
+          btnMove.textContent = 'Déplacer';
+          btnMove.onclick = ()=> { store.moveItem(it.id, sel.value); render(); };
+          act.appendChild(sel);
+          act.appendChild(btnMove);
+        }
+
+        const btnDel = document.createElement('button');
+        btnDel.className = 'btn btn-outline';
+        btnDel.textContent = 'Supprimer';
+        btnDel.onclick = ()=> { if(confirm('Supprimer cet article ?')) { store.removeItem(it.id); render(); } };
+        act.appendChild(btnDel);
+      } else {
+        act.innerHTML = `<span class="muted">Lecture seule</span>`;
+      }
+
+      tb.appendChild(tr);
+    });
+
+    if (!tb.children.length) {
+      tb.innerHTML = `<tr><td colspan="6" class="muted">Aucun article visible avec tes droits.</td></tr>`;
+    }
+  }
+
+  function renderSizes(it) {
+    const entries = Object.entries(it.sizes || {});
+    if (!entries.length) return '—';
+    const canEdit = auth.canEditStock?.(user, it.space);
+    if (canEdit) {
+      return entries.map(([sz,qty]) => {
+        return `<label style="display:inline-flex;align-items:center;gap:6px;margin-right:8px">
+          <span style="font-weight:700">${sz}</span>
+          <input type="number" data-id="${it.id}" data-size="${sz}" value="${qty}" min="0" style="width:80px">
+        </label>`;
+      }).join('<br>');
+    }
+    return entries.map(([sz,qty])=>`${sz}: ${qty}`).join(' | ');
+  }
+
+  // Délégation pour les inputs tailles
+  document.addEventListener('change', (e)=>{
+    const inp = e.target;
+    if (inp && inp.matches('input[type=number][data-id][data-size]')) {
+      store.setQuantity({ id: inp.dataset.id, size: inp.dataset.size, value: inp.value });
+    }
+  });
+
+  function openAddItem() {
+    const isLogResp = (auth.spaceRole?.(user, 'logistique') === 'responsable') || auth.isAdmin?.(user);
+    const spaceSelect = isLogResp ? `
+      <label>Espace<br>
+        <select id="new-space">
+          <option value="accueil">accueil</option>
+          <option value="logistique">logistique</option>
+        </select>
+      </label>` : '';
+
+    UI.openModal({
+      title: 'Ajouter un article',
+      contentHTML: `
+        <form id="add-form" class="list" onsubmit="return false;">
+          <label>ID (unique)<br><input id="new-id" required></label>
+          <label>Libellé<br><input id="new-label" required></label>
+          <label>Catégorie<br><input id="new-cat"></label>
+          ${spaceSelect || `<p class="muted">Ajout autorisé uniquement pour les responsables logistique.</p>`}
+          <label>Type<br>
+            <select id="new-type">
+              <option value="simple">Quantité unique</option>
+              <option value="sizes">Tailles</option>
+            </select>
+          </label>
+          <div id="sizes-zone" style="display:none">
+            <fieldset><legend>Tailles initiales</legend>
+              <div class="muted" style="margin-bottom:6px">Ex: XS:10;S:20;M:30</div>
+              <input id="new-sizes" placeholder="XS:10;S:20;M:30;L:40;XL:20">
+            </fieldset>
+          </div>
+          <div id="qty-zone">
+            <label>Quantité initiale<br><input id="new-qty" type="number" min="0" value="0"></label>
+          </div>
+          <div class="actions">
+            <button class="btn" id="btn-save">Ajouter</button>
+            <button class="btn btn-outline" type="button" onclick="UI.closeModal()">Annuler</button>
+          </div>
+        </form>`
+    });
+
+    const typeSel = document.getElementById('new-type');
+    const sizesZone = document.getElementById('sizes-zone');
+    const qtyZone   = document.getElementById('qty-zone');
+    typeSel.onchange = ()=>{
+      const isSizes = typeSel.value === 'sizes';
+      sizesZone.style.display = isSizes ? 'block' : 'none';
+      qtyZone.style.display   = isSizes ? 'none' : 'block';
+    };
+
+    document.getElementById('btn-save').onclick = ()=>{
+      if (!isLogResp) { alert("Droit insuffisant."); return; }
+      try{
+        const id    = document.getElementById('new-id').value.trim();
+        const label = document.getElementById('new-label').value.trim();
+        const cat   = document.getElementById('new-cat').value.trim();
+        const space = isLogResp ? document.getElementById('new-space').value : 'logistique';
+        const type  = document.getElementById('new-type').value;
+        if (!id || !label) { alert('ID et libellé requis'); return; }
+
+        if (type === 'sizes') {
+          const raw = (document.getElementById('new-sizes').value || '').trim();
+          const sizes = {};
+          raw.split(';').map(s=>s.trim()).filter(Boolean).forEach(kv=>{
+            const [k,v] = kv.split(':');
+            sizes[(k||'').trim()] = Math.max(0, parseInt((v||'0').trim(),10));
+          });
+          store.addItem({ id, label, category:cat, space, trackSizes:true, sizes });
+        } else {
+          const qty = Math.max(0, parseInt((document.getElementById('new-qty').value||'0'),10));
+          store.addItem({ id, label, category:cat, space, quantity:qty, unit:'pcs' });
+        }
+        UI.closeModal();
+        render();
+      }catch(e){
+        alert(e.message || 'Erreur ajout');
+      }
+    };
+  }
+
+  // premier rendu
+  render();
+</script>
+</body>
+</html>

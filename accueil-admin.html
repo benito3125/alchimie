@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Administration d'un espace</title>
+<link rel="stylesheet" href="./assets/ui.css">
+</head>
+<body>
+<header class="header"><div id="app-header"></div></header>
+<main class="wrap">
+<section class="notice"><h2 id="h">Administration d’espace</h2>
+    <p class="help">Les responsables peuvent changer le rôle (benevole/responsable) ou retirer des membres de leur espace.</p>
+  </section>
+
+  <section class="card">
+    <table class="table" id="tbl"><thead><tr><th>Utilisateur</th><th>Rôle</th><th>Action</th></tr></thead><tbody></tbody></table>
+  </section>
+
+  
+  <section class="card">
+    <h3>Créer/Enregistrer un bénévole (démo)</h3>
+    <div class="row">
+      <label>Identifiant<br><input id="u"></label>
+      <label>Mot de passe initial<br><input id="p" value="alchimie"></label>
+    </div>
+    <div class="row">
+      <label>Attribuer à l’espace accueil comme<br>
+        <select id="r"><option value="benevole">Bénévole</option><option value="responsable">Responsable</option></select>
+      </label>
+      <div></div>
+    </div>
+    <button class="btn" id="create">Créer</button>
+    <p id="msg" class="help"></p>
+  </section>
+</main>
+<footer id="app-footer" class="footer"></footer>
+
+<script src="./assets/auth.js"></script><script src="./assets/ui.js"></script>
+
+<script>
+  UI.mountHeader(); UI.mountFooter(); UI.injectAuthModals();
+  const params=new URLSearchParams(location.search); const space=params.get('space')||'accueil';
+  document.getElementById('h').textContent = `Administration de l’espace : ${space}`;
+  const me=auth.getUser(); if(!auth.isAdmin(me) && !auth.hasRole(me, space,'responsable')){ alert('Accès refusé'); location.href='catalog.html'; }
+  const $=s=>document.querySelector(s), T=$('#tbl tbody');
+
+  function rows(){
+    const out=[];
+    auth.listUsers().forEach(u=>{
+      const r=(u.spaces||{})[space];
+      if(r) out.push({role:r, name:u.username});
+    });
+    return out;
+  }
+  function render(){
+    T.innerHTML = rows().map(x=>`<tr><td>${x.name}</td><td>${x.role}</td>
+      <td>
+        <button class="btn small outline" data-act="set" data-u="${x.name}" data-r="benevole">Bénévole</button>
+        <button class="btn small outline" data-act="set" data-u="${x.name}" data-r="responsable">Responsable</button>
+        <button class="btn small" data-act="del" data-u="${x.name}">Retirer</button>
+      </td></tr>`).join('');
+  }
+  document.body.addEventListener('click',e=>{
+    const a=e.target.closest('[data-act]'); if(!a) return;
+    const u=a.getAttribute('data-u'), act=a.getAttribute('data-act');
+    if(act==='set'){ auth.setMembership(u,space,a.getAttribute('data-r')); }
+    if(act==='del'){ auth.setMembership(u,space,null); }
+    render();
+  });
+  render();
+</script>
+</body>
+</html>

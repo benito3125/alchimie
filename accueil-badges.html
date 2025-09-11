@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Édition des badges — Accueil bénévoles</title>
+<link rel="stylesheet" href="./assets/ui.css">
+</head>
+<body>
+<header class="header"><div id="app-header"></div></header>
+<main class="wrap">
+  <section class="notice"><h2>Édition des badges — Accueil bénévoles</h2>
+    <p class="help">Réservé aux <b>responsables</b> de l’espace accueil (ou admin).</p>
+  </section>
+
+  <section class="card">
+    <div class="row">
+      <label>Utilisateur<br><input id="u" placeholder="identifiant exact"></label>
+      <label>Type de badge<br>
+        <select id="t"><option>Standard</option><option>Responsable</option><option>VIP</option></select>
+      </label>
+    </div>
+    <div class="row">
+      <label>Infos additionnelles<br><input id="i" placeholder="Allergies, accès spéciaux…"></label>
+      <div></div>
+    </div>
+    <button class="btn" id="print">Générer (démo)</button>
+    <p id="msg" class="help"></p>
+  </section>
+</main>
+<footer id="app-footer" class="footer"></footer>
+
+<script src="./assets/auth.js"></script><script src="./assets/ui.js"></script>
+<script>
+  UI.mountHeader(); UI.mountFooter(); UI.injectAuthModals();
+  const me = auth.getUser();
+  const allowed = auth.canAccessTool(me, {space:'accueil', minRole:'responsable'}) || auth.isAdmin(me);
+  if(!allowed){ alert("Accès réservé aux responsables de l’accueil."); location.href='catalog.html'; }
+
+  document.getElementById('print').onclick = ()=>{
+    const u=document.getElementById('u').value.trim(); if(!u){ alert('Utilisateur manquant'); return; }
+    const t=document.getElementById('t').value, info=document.getElementById('i').value;
+    document.getElementById('msg').textContent = `Badge ${t} pour ${u} généré (démo). ${info?('Infos: '+info):''}`;
+  };
+</script>
+</body>
+</html>

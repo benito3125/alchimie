@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Administration des comptes</title>
+  <link rel="stylesheet" href="./assets/ui.css">
+</head>
+<body>
+<header class="header"><div id="app-header" class="bar"></div></header>
+
+<main class="wrap">
+  <section class="notice">
+    <h2>Administration des comptes</h2>
+    <p class="muted">Réservé aux administrateurs.</p>
+  </section>
+
+  <section class="card">
+    <div class="actions">
+      <button class="btn" id="btn-create">+ Créer un utilisateur</button>
+      <span class="muted">Rôles globaux : <em>admin</em>, <em>comite</em>, <em>visiteur</em>.</span>
+    </div>
+
+    <table class="table" id="tbl-users">
+      <thead>
+        <tr><th>Email</th><th>Rôle</th><th>Nom</th><th>Actions</th></tr>
+      </thead>
+      <tbody><tr><td colspan="4" class="muted">Chargement…</td></tr></tbody>
+    </table>
+  </section>
+</main>
+
+<footer id="app-footer" class="footer"></footer>
+
+<script src="./assets/auth.js"></script>
+<script src="./assets/ui.js"></script>
+<script>
+UI.mountHeader('Administration des comptes'); UI.mountFooter();
+</script>
+<script>
+const API = '/preprod/api';
+
+function authHeader(){
+  const t = (window.auth && auth.getToken && auth.getToken()) || localStorage.getItem('aaj_token');
+  return t ? { 'Authorization': 'Bearer '+t } : {};
+}
+async function jfetch(url, opts={}){
+  const r = await fetch(url, {
+    ...opts,
+    headers: { 'Content-Type':'application/json', ...authHeader(), ...(opts.headers||{}) }
+  });
+  const data = await r.json().catch(()=>null);
+  if(!r.ok) throw new Error(data?.error || r.statusText);
+  return data;
+}
+
+async function ensureAdmin(){
+  const { user } = await jfetch(`${API}/me.php`);
+  if((user.role||'')!=='admin'){ alert('Accès réservé aux administrateurs'); location.href='catalog.html'; return false; }
+  return true;
+}
+
+async function loadUsers(){
+  const tb = document.querySelector('#tbl-users tbody');
+  tb.innerHTML = `<tr><td colspan="4" class="muted">Chargement…</td></tr>`;
+  try{
+    const { items } = await jfetch(`${API}/users.php`);
+    if(!items || !items.length){ tb.innerHTML = `<tr><td colspan="4" class="muted">Aucun utilisateur.</td></tr>`; return; }
+    tb.innerHTML='';
+    for(const u of items){
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${u.email}</td>
+        <td>${u.role}</td>
+        <td>${(u.first_name||'')+' '+(u.family_name||'')}</td>
+        <td class="actions">
+          <button class="btn small" data-act="edit" data-id="${u.id}">Éditer</button>
+          <button class="btn small outline" data-act="reset" data-id="${u.id}">Reset MP</button>
+          <button class="btn small outline danger" data-act="del" data-id="${u.id}">Supprimer</button>
+        </td>`;
+      tb.appendChild(tr);
+    }
+  }catch(e){
+    tb.innerHTML = `<tr><td colspan="4">Impossible de récupérer les comptes.<br><span class="muted">${e.message}</span></td></tr>`;
+  }
+}
+
+function openCreate(){
+  const content = `
+    <form class="list" id="frm-create" onsubmit="return false;">
+      <label>Email<br><input id="u-email" required type="email"></label>
+      <label>Mot de passe (≥ 6 car.)<br><input id="u-pass" type="password"></label>
+      <div class="row">
+        <label>Prénom<br><input id="u-first"></label>
+        <label>Nom<br><input id="u-last"></label>
+      </div>
+      <label>Rôle global<br>
+        <select id="u-role">
+          <option value="visiteur">visiteur</option>
+          <option value="comite">comite</option>
+          <option value="admin">admin</option>
+        </select>
+      </label>
+      <fieldset><legend>Espaces</legend>
+        <div class="space-row">
+          <label><input type="checkbox" value="accueil"> accueil</label>
+          <select><option value="benevole">Bénévole</option><option value="responsable">Responsable</option></select>
+        </div>
+        <div class="space-row">
+          <label><input type="checkbox" value="logistique"> logistique</label>
+          <select><option value="benevole">Bénévole</option><option value="responsable">Responsable</option></select>
+        </div>
+        <div class="space-row">
+          <label><input type="checkbox" value="repas"> repas</label>
+          <select><option value="benevole">Bénévole</option><option value="responsable">Responsable</option></select>
+        </div>
+      </fieldset>
+      <div class="actions">
+        <button class="btn" id="btn-save">Créer</button>
+        <button class="btn outline" type="button" onclick="UI.closeModal()">Annuler</button>
+      </div>
+    </form>`;
+  if(UI?.openModal){ UI.openModal({title:'Créer un utilisateur', contentHTML:content}); }
+  else { const d=document.createElement('div'); d.innerHTML=content; document.body.appendChild(d); }
+
+  document.getElementById('btn-save').onclick = async ()=>{
+    const email = document.getElementById('u-email').value.trim();
+    const password = document.getElementById('u-pass').value;
+    const role = document.getElementById('u-role').value;
+    const first_name = document.getElementById('u-first').value.trim();
+    const family_name= document.getElementById('u-last').value.trim();
+
+    const spaces = [...document.querySelectorAll('.space-row')].map(r=>{
+      const cb=r.querySelector('input[type=checkbox]');
+      if(!cb.checked) return null;
+      return { space_id: cb.value, role: r.querySelector('select').value };
+    }).filter(Boolean);
+
+    try{
+      await jfetch(`${API}/users.php`, { method:'POST', body: JSON.stringify({email,password,role,first_name,family_name,spaces}) });
+      UI.closeModal?.(); loadUsers();
+    }catch(e){ alert(e.message); }
+  };
+}
+
+document.getElementById('btn-create').onclick = openCreate;
+
+(async function(){
+  if(!await ensureAdmin()) return;
+  await loadUsers();
+
+  // actions (edit/reset/delete) -> à compléter plus tard si besoin
+  document.querySelector('#tbl-users').addEventListener('click', async (e)=>{
+    const b = e.target.closest('button'); if(!b) return;
+    const id = b.dataset.id;
+    if(b.dataset.act==='del'){
+      if(!confirm('Supprimer cet utilisateur ?')) return;
+      try{ await jfetch(`${API}/users.php?id=${id}`, { method:'DELETE' }); loadUsers(); }
+      catch(err){ alert(err.message); }
+    }
+    if(b.dataset.act==='reset'){
+      const np = prompt('Nouveau mot de passe (laisser vide pour annuler):','');
+      if(np===null) return;
+      if(np && np.length<6) return alert('Mot de passe trop court.');
+      try{ await jfetch(`${API}/users.php?id=${id}`, { method:'PUT', body: JSON.stringify({ password: np }) }); alert('Mot de passe réinitialisé.'); }
+      catch(err){ alert(err.message); }
+    }
+    if(b.dataset.act==='edit'){
+      alert('Édition détaillée à brancher (PUT) — la structure API est prête.');
+    }
+  });
+})();
+</script>
+</body>
+</html>

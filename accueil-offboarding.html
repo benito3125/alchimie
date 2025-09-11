@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Offboarding — Accueil bénévoles</title>
+<link rel="stylesheet" href="./assets/ui.css">
+</head>
+<body>
+<header class="header"><div id="app-header"></div></header>
+<main class="wrap">
+  <section class="notice"><h2>Offboarding — Accueil bénévoles</h2>
+    <p class="help">Retirer un membre de l’espace. Ne supprime pas le compte (réservé aux administrateurs).</p>
+  </section>
+
+  <section class="card">
+    <div class="row">
+      <label>Utilisateur<br><input id="u" placeholder="identifiant exact"></label>
+      <div></div>
+    </div>
+    <button class="btn" id="remove">Retirer de l’espace accueil</button>
+    <p id="msg" class="help"></p>
+  </section>
+</main>
+<footer id="app-footer" class="footer"></footer>
+
+<script src="./assets/auth.js"></script><script src="./assets/ui.js"></script>
+<script>
+  UI.mountHeader(); UI.mountFooter(); UI.injectAuthModals();
+  const me = auth.getUser();
+  const allowed = auth.canAccessTool(me, {space:'accueil', minRole:'benevole'});
+  if(!allowed){ alert("Accès réservé aux membres de l’espace accueil."); location.href='catalog.html'; }
+
+  document.getElementById('remove').onclick = ()=>{
+    const u = document.getElementById('u').value.trim();
+    if(!u){ alert('Identifiant manquant'); return; }
+    auth.setMembership(u,'accueil',null);
+    document.getElementById('msg').textContent = `Utilisateur ${u} retiré de l’espace accueil. (Compte conservé)`;
+  };
+</script>
+</body>
+</html>
